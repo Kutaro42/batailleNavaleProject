@@ -1,0 +1,26 @@
+trame :
+
+client ==> [x;y]
+
+serveur ==> [Touché|Raté|Coulé ; coup restant]
+
+
+
+struct ==> bateau ()
+
+struct ==> coordonées
+
+==> while avec nb_coup
+
+==> init_tableau (dyna)
+
+==> gen_bateau_posxy
+
+==>
+
+
+
+
+-------------------------
+
+0 0 0 0 0
