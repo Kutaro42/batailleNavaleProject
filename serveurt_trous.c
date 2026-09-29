@@ -77,6 +77,10 @@ struct  sockaddr_in serveur; /* SAP du serveur */
 				inet_ntoa(client.sin_addr),
 				ntohs(client.sin_port),buf_read);
 
+			//TRAITEMENT 
+
+
+
 			// ON RÉPOND AU CLIENT
 			sprintf(buf_write,"[STATUT ; COUPS RESTANT]",id,nb_reponse++);
 			ret=write(sock_pipe,buf_write,sizeof(buf_write));
