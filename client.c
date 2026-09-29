@@ -54,6 +54,8 @@ int ret,len;
 	while(!connection_closed) {
 		char    buf_read[1<<8], buf_write[1<<8];
 
+        // PARTIE GESTION CLIENT
+
 		sprintf(buf_write,"[coordonées]",id,nb_question); //coordonées x;y
 		printf(" client %2s: (%s:%4d) envoie a  ", id,      //debug
 			inet_ntoa(moi.sin_addr),ntohs(moi.sin_port));   //debug
@@ -66,11 +68,14 @@ int ret,len;
 				argv[0],ret,strerror(errno));
 			continue;
 		}
+
+        // PARTIE GESTION SERVEUR
+
 		printf(" client %2s: (%s:%4d) recoit de ",id, 
 				inet_ntoa(moi.sin_addr),ntohs(moi.sin_port));
 		ret=read(sock,buf_read,len);	//on lit dans le descripteur standard du socket serveur (serveur)
 		if (ret<=0) {
-			printf("\n%s:  erreur dans read (num=%d, mess=%s)\n",
+			printf("\n%s:  erreur dans read (num=%d, mess=%s)\n",// on traite l'erreur en cas d'échec
 				argv[0],ret,strerror(errno));
 			continue;
 		}

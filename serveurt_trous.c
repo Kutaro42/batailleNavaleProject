@@ -20,6 +20,7 @@ char* id=0;
 short port=0;
 int sock=0;	/* socket de communication */
 
+bool connection_closed = 0; //renseigne l'état de la connection (=indicateur de l'état de connection en tps réel)
 int  nb_reponse=0;
 
 int main(int argc, char** argv)
@@ -51,16 +52,21 @@ struct  sockaddr_in serveur; /* SAP du serveur */
 		exit(1);
    }
 
+
+
+   //BOUCLE DE JEU
 	while (1) {
 		struct  sockaddr_in client; /* SAP du client */
 		int     len=sizeof(client);
 		int     sock_pipe;          /* socket de dialogue */
 		int     ret,nb_question;
 
-    	sock_pipe = accept(sock,(struct sockaddr*)&client,(socklen_t*)&len);
+    	sock_pipe = accept(sock,(struct sockaddr*)&client,(socklen_t*)&len); //on accepte le traitement des demande du client courant
 		for ( nb_question=0 ; nb_question<NBECHANGE ; nb_question++) {
 			char    buf_read[1<<8], buf_write[1<<8];
 
+
+			// ON LIT LE MSG DU CLIENT
 			ret=read(sock_pipe,buf_read,sizeof(buf_read));
 			if (ret<=0) {
 				printf("%s: read=%d: %s\n",argv[0],ret,
@@ -70,8 +76,12 @@ struct  sockaddr_in serveur; /* SAP du serveur */
 			printf("serveur %s recu de (%s,%4d) : %s\n",id,
 				inet_ntoa(client.sin_addr),
 				ntohs(client.sin_port),buf_read);
-			sprintf(buf_write,"#%2s=%03d#",id,nb_reponse++);
+
+			// ON RÉPOND AU CLIENT
+			sprintf(buf_write,"[STATUT ; COUPS RESTANT]",id,nb_reponse++);
 			ret=write(sock_pipe,buf_write,sizeof(buf_write));
+
+			//si le retour s'est mal passé, on traite l'erreur
 			if (ret<=0) {
 				printf("%s: write=%d: %s\n",argv[0],ret,
 					strerror(errno));
