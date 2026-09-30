@@ -56,14 +56,14 @@ int ret,len;
 
 		// PRISE D'ENTREE CLAVIER POUR LE JOUEUR
 		//on prend le flux clavier et on en écrit le contenu dans le buffer
+		//forme de l'input : [x;y]
+		char input_buff[1<<3]; // on à théoriquement besoin d'entrer seulement 4 caractères (=16 bits) mais on peux en rajouter pour + de place pour d'éventuel information supp
+		int inputing =read(0,input_buff,sizeof(input_buff));//lit l'entree standard et stocke la chaine traitée dans le buffer input_buff
+		int writting =write(buf_write,input_buff,sizeof(inputing));//on fait la taille de inputing pour lire le nbre de caractères réellement lus.
 
-		char input_buff[1<<1]; // on à théoriquement besoin d'entrer seulement 2 caractères (=16 bits)
-		int inputing =read(0,input_buff,sizeof(input_buff));//lit l'entree standard
-		write()
+        // PARTIE GESTION CLIENT |==> on vise à long terme une gestion sécurisé des entrées clavier du joueur, pour éviter et empêcher les erreurs de saisie avant qu'elles soient envoyées au serveur.
 
-        // PARTIE GESTION CLIENT
-
-		sprintf(buf_write,"[coordonées]",id,nb_question); //coordonées x;y
+		sprintf(buf_write,input_buff,id,nb_question); //coordonées x;y ==> temporairement 'input_buff' pour vérifier, résultat de la couche de sécurité dans un second temps.
 		printf(" client %2s: (%s:%4d) envoie a  ", id,      //debug
 			inet_ntoa(moi.sin_addr),ntohs(moi.sin_port));   //debug
 		printf("(%s:%4d) : %s\n",                           //debug
