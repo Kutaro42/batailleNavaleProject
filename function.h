@@ -14,11 +14,13 @@
 #define NBRE_PORTE_AVIONS 1
 #define NBRE_FREGATES 1
 
-int nbr_coup_restant = TOTAL_COUPS;
-char * buff_coup_restant[TAILLE_BUFF];
-bool fin_de_partie = 0;
-bool reste_il_un_bateau = 1;
-bool ** grille_de_jeu[50][50];
+//DECLARATION DES VARIABLES GLOBALES
+extern int nbr_coup_restant_ ;
+extern char * buff_coup_restant_[TAILLE_BUFF];
+extern bool fin_de_partie_ ;
+extern bool reste_il_un_bateau_;
+extern bool ** grille_de_jeu_[50][50];
+extern struct bateau_ bateau_en_jeu;
 
 typedef struct position {
     int x;
@@ -57,7 +59,7 @@ typedef struct bateau_{
     struct porte_avion *porte_avion_en_jeu[NBRE_PORTE_AVIONS];
 }bateau_;
 
-struct bateau_ bateau_en_jeu;
+
 /*
 struct bateau {
     int size;

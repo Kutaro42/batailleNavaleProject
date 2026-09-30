@@ -1,5 +1,9 @@
-
 #include "function.h"
+
+//definitition des variables globales :
+int nbr_coup_restant_ = TOTAL_COUPS;
+bool fin_de_partie_ = 0;
+bool reste_il_un_bateau_ = 1;
 
 //formatte un buffer spécifié en argument; renvoie 0 = faux en cas d'erreur, 1=vrai si tout se passe bien
 bool print_nb_coup_restant(char * buff, int nb_coup){
