@@ -1,0 +1,7 @@
+#include "function.h"
+
+int main(){
+    printf("hello world");
+
+    return 0;
+}
