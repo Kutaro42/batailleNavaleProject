@@ -54,6 +54,13 @@ int ret,len;
 	while(!connection_closed) {
 		char    buf_read[1<<8], buf_write[1<<8];
 
+		// PRISE D'ENTREE CLAVIER POUR LE JOUEUR
+		//on prend le flux clavier et on en écrit le contenu dans le buffer
+
+		char input_buff[1<<1]; // on à théoriquement besoin d'entrer seulement 2 caractères (=16 bits)
+		int inputing =read(0,input_buff,sizeof(input_buff));//lit l'entree standard
+		write()
+
         // PARTIE GESTION CLIENT
 
 		sprintf(buf_write,"[coordonées]",id,nb_question); //coordonées x;y

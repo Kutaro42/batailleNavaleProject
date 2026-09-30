@@ -22,10 +22,10 @@ extern bool reste_il_un_bateau_;
 extern bool ** grille_de_jeu_[50][50];
 extern struct bateau_ bateau_en_jeu;
 
-typedef struct position {
+typedef struct position_ {
     int x;
     int y;
-}position;
+}position_;
 
 //   Résultat renvoyé par le serveur au client
 enum RESULT_SHOOT{
@@ -41,6 +41,7 @@ enum STATE_CASE{
 
 typedef struct Case {
     enum STATE_CASE etat;
+    struct position_ position;
 }Case;
 
 typedef struct porte_avion {
