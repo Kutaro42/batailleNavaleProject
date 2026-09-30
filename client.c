@@ -15,7 +15,7 @@
 
 char* id=0;
 short sport=0;
-bool connection_closed = 0; //renseigne l'état de la connection (=indicateur de l'état de connection en tps réel)
+_Bool connection_closed = 0; //renseigne l'état de la connection (=indicateur de l'état de connection en tps réel)
 
 int sock=0;	/* socket de communication */
 

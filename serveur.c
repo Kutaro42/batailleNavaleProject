@@ -22,7 +22,7 @@ char* id=0;
 short port=0;
 int sock=0;	/* socket de communication */
 
-bool connection_closed = 0; //renseigne l'état de la connection (=indicateur de l'état de connection en tps réel)
+_Bool connection_closed = 0; //renseigne l'état de la connection (=indicateur de l'état de connection)
 int  nb_reponse=0;
 
 int main(int argc, char** argv)
@@ -54,9 +54,13 @@ struct  sockaddr_in serveur; /* SAP du serveur */
 		exit(1);
    }
 
+   //CHARGEMENT ET INITIALISATION DES PARAMETRES DE JEU
+
+   // CHARGER LA MAP :
 
 
-   //BOUCLE DE JEU
+
+   //BOUCLE DE CONNECTION & JEU
 	while (1) {
 		struct  sockaddr_in client; /* SAP du client */
 		int     len=sizeof(client);
@@ -64,11 +68,16 @@ struct  sockaddr_in serveur; /* SAP du serveur */
 		int     ret,nb_question;
 
     	sock_pipe = accept(sock,(struct sockaddr*)&client,(socklen_t*)&len); //on accepte le traitement des demande du client courant
+
+
+		//JEU
 		while (!la_partie_est_elle_finie(&nbr_coup_restant_, &fin_de_partie_)) {
 			char    buf_read[5], buf_write[24]="[STATUT ; COUPS RESTANT]";// pour nos premiers test 24 caractère sont suffisant, mais on se garde la possibilité d'en rajouter
 
 
 			//buf_read[ret] = '\0'; POUR GERER LA DECOUPE DU MESSAGE
+
+
 			// ON LIT LE MSG DU CLIENT
 			ret=read(sock_pipe,buf_read,sizeof(buf_read));
 			if (ret<=0) {
@@ -80,9 +89,20 @@ struct  sockaddr_in serveur; /* SAP du serveur */
 				inet_ntoa(client.sin_addr),
 				ntohs(client.sin_port),buf_read);
 
-			//TRAITEMENT 
+			//TRAITEMENT DU MSG CLIENT
 
-			//debug : on teste avec un buffer prédéfinit :
+			//1) récupérer les deux valeurs numérique séparée par un point-virgule
+			//2) vérifier si une case de bateau existe à la position correspondante, si active (renvoi "touché")
+			//3) démarrer le système de questions-réponses client-serveur :
+
+
+
+
+
+
+
+
+			//--------------------------------------------------------------------------
 			
 
 			// ON RÉPOND AU CLIENT

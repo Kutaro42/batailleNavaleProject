@@ -6,7 +6,9 @@ int main(){
     //DEBUG TEST : création d'une frégate dans la liste des bateau en jeu
     struct bateau_ test;
     
-    test.fregate_en_jeu[0]->case_occupee[0].position.x;
+    struct bateau_ fregate1=test.fregate_en_jeu[0];
+
+
 
     return 0;
 }

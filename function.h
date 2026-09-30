@@ -7,7 +7,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <stdbool.h>
+
 
 #define TOTAL_COUPS 50
 #define TAILLE_BUFF 50
@@ -17,9 +17,9 @@
 //DECLARATION DES VARIABLES GLOBALES
 extern int nbr_coup_restant_ ;
 extern char * buff_coup_restant_[TAILLE_BUFF];
-extern bool fin_de_partie_ ;
-extern bool reste_il_un_bateau_;
-extern bool ** grille_de_jeu_[50][50];
+extern _Bool fin_de_partie_ ;
+extern _Bool reste_il_un_bateau_;
+extern _Bool * grille_de_jeu_[50][50];
 extern struct bateau_ bateau_en_jeu;
 
 typedef struct position_ {
@@ -34,6 +34,11 @@ enum RESULT_SHOOT{
     COULEE
 };
 
+enum TYPE_BOAT{
+    FREGATE=3,
+    PORTE_AVION=5
+};
+
 enum STATE_CASE{
     NON_ACTIVE,
     ACTIVE
@@ -44,20 +49,32 @@ typedef struct Case {
     struct position_ position;
 }Case;
 
+//------------------------------------------------------
+/*
 typedef struct porte_avion {
     struct Case *cases_occupee[5];
+    const int taille=5;
     //...
 
 }porte_avion;
-
 typedef struct fregate{
     struct Case *case_occupee[3];
+    const int taille=3;
     //<..
-}fregate;
+}fregate;*/
+//-------------------------------------------------------
 
-typedef struct bateau_{
-    struct fregate *fregate_en_jeu[NBRE_FREGATES];
-    struct porte_avion *porte_avion_en_jeu[NBRE_PORTE_AVIONS];
+typedef struct Bateau{
+    enum TYPE_BOAT type;
+    struct Case *cases_occupee[5]; //mettre à 5 case, on en activera que 3 pour les frégate (on met des zéro sur les deux dernières)
+
+}Bateau;
+
+
+
+typedef struct bateau_en_jeu{
+    struct Bateau *Bateau_en_jeu[NBRE_FREGATES+NBRE_PORTE_AVIONS];
+
 }bateau_;
 
 
@@ -69,10 +86,14 @@ struct bateau {
 */
 
 //METHODES & FONCTIONS
-bool la_partie_est_elle_finie(int * nbr_coup_restant, bool*fin_de_partie_);
-bool reste_t_il_un_bateau();
+
+_Bool la_partie_est_elle_finie(int * nbr_coup_restant, _Bool*fin_de_partie_);
+
+_Bool reste_t_il_un_bateau(bateau_en_jeu *bateau_en_jeu,_Bool*fin_de_partie_);
+
 int dec_nb_coup_restant(int * nbr_coup_restant);
-bool print_nb_coup_restant(char * buff, int nb_coup);
+
+_Bool print_nb_coup_restant(char * buff, int nb_coup);
 
 
 
