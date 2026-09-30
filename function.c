@@ -1,4 +1,6 @@
 #include "function.h"
+#include <stdbool.h>
+
 
 //definitition des variables globales :
 int nbr_coup_restant_ = TOTAL_COUPS;
@@ -30,13 +32,13 @@ bool reste_t_il_un_bateau(){
 
 }
 // 
-bool la_partie_est_elle_finie(int * nbr_coup_restant, int*fin_de_partie){
+bool la_partie_est_elle_finie(int * nbr_coup_restant, bool*fin_de_partie_){
     if(nbr_coup_restant <= 0 && !reste_t_il_un_bateau ){
-        *fin_de_partie =1;
-        return 0;
+        *fin_de_partie_ =1;
     }
     else {
-        return 1;
+        *fin_de_partie_=0;
     }
+    return *fin_de_partie_;
 
 }

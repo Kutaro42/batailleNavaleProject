@@ -14,6 +14,8 @@
 #include <netinet/in.h>  // Pour sockaddr_in, htons, ntohs, INADDR_ANY
 #include <arpa/inet.h>   // Pour inet_ntoa
 
+#include "function.h"
+
 #define NBECHANGE 3
 
 char* id=0;
@@ -62,10 +64,11 @@ struct  sockaddr_in serveur; /* SAP du serveur */
 		int     ret,nb_question;
 
     	sock_pipe = accept(sock,(struct sockaddr*)&client,(socklen_t*)&len); //on accepte le traitement des demande du client courant
-		for ( nb_question=0 ; nb_question<NBECHANGE ; nb_question++) {
-			char    buf_read[1<<8], buf_write[1<<8];
+		while (!la_partie_est_elle_finie(&nbr_coup_restant_, &fin_de_partie_)) {
+			char    buf_read[5], buf_write[24]="[STATUT ; COUPS RESTANT]";// pour nos premiers test 24 caractère sont suffisant, mais on se garde la possibilité d'en rajouter
 
 
+			//buf_read[ret] = '\0'; POUR GERER LA DECOUPE DU MESSAGE
 			// ON LIT LE MSG DU CLIENT
 			ret=read(sock_pipe,buf_read,sizeof(buf_read));
 			if (ret<=0) {
@@ -79,10 +82,11 @@ struct  sockaddr_in serveur; /* SAP du serveur */
 
 			//TRAITEMENT 
 
-
+			//debug : on teste avec un buffer prédéfinit :
+			
 
 			// ON RÉPOND AU CLIENT
-			sprintf(buf_write,"[STATUT ; COUPS RESTANT]",id,nb_reponse++);
+			//sprintf(buf_write); --> pas besoin de mise en forme
 			ret=write(sock_pipe,buf_write,sizeof(buf_write));
 
 			//si le retour s'est mal passé, on traite l'erreur

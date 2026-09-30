@@ -52,25 +52,37 @@ int ret,len;
 
     //Tant que la connection n'est pas interrompue (par un code de sortie du serveur), répéter :
 	while(!connection_closed) {
-		char    buf_read[1<<8], buf_write[1<<8];
+		char    buf_read[1<<8], buf_write[5];// 9 caractères en réalité, car le 10ème est remplacé par un zéro (ligne 62) pour gérer la fin de chaine
 
 		// PRISE D'ENTREE CLAVIER POUR LE JOUEUR
 		//on prend le flux clavier et on en écrit le contenu dans le buffer
 		//forme de l'input : [x;y]
-		char input_buff[1<<3]; // on à théoriquement besoin d'entrer seulement 4 caractères (=16 bits) mais on peux en rajouter pour + de place pour d'éventuel information supp
-		int inputing =read(0,input_buff,sizeof(input_buff));//lit l'entree standard et stocke la chaine traitée dans le buffer input_buff
-		int writting =write(buf_write,input_buff,sizeof(inputing));//on fait la taille de inputing pour lire le nbre de caractères réellement lus.
+		//char input_buff[1<<3]; // on à théoriquement besoin d'entrer seulement 4 caractères (=16 bits) mais on peux en rajouter pour + de place pour d'éventuel information supp
+		int inputing =read(0,buf_write,sizeof(buf_write));//lit l'entree standard et stocke la chaine traitée dans le buffer write_buf 
+		
+
+		//	REMARQUE IMPORTANTE : -----------------------------------------------------------------------------------------------------------------------------------------------------------
+		//	- Dans l'état actuel, la lecture de l'entrée utilisateur se heurte à un problème majeur : 
+		//	Au delà de 9 caractère écrit dans le flux standard, le surplus reste en mémoir le tampon et le système l'envoie automatiquement pour remplir les itération suivante du buffer.
+		//	Ce comportement implique un découpage forcé qui oblige le client à envoyer ces caractères inutiles dans des requêtes à la chaine, ce qui pollue le flux et paralyse le serveur.
+		//	Pour le moment nous nous concentrerons sur le fonctionnement pur de la connection, mais la robustesse du code impliquerait une boucle de vidage qui lit les caractère poubelle et
+		//	les place dans un buffer de vidage avant de vider ce buffer. Le principe étant de vider et remplir le buffer poubelle de ces caractère jusqu'a épuisement de ces derniers.
+		// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+		buf_write[inputing] = '\0'; 
+		//int writting =write(,input_buff,sizeof(inputing));//on fait la taille de inputing pour lire le nbre de caractères réellement lus.
 
         // PARTIE GESTION CLIENT |==> on vise à long terme une gestion sécurisé des entrées clavier du joueur, pour éviter et empêcher les erreurs de saisie avant qu'elles soient envoyées au serveur.
 
-		sprintf(buf_write,input_buff,id,nb_question); //coordonées x;y ==> temporairement 'input_buff' pour vérifier, résultat de la couche de sécurité dans un second temps.
+		//sprintf(buf_write,":%s",id); //coordonées x;y ==> temporairement 'buf_write' pour vérifier, résultat de la couche de sécurité dans un second temps.
 		printf(" client %2s: (%s:%4d) envoie a  ", id,      //debug
 			inet_ntoa(moi.sin_addr),ntohs(moi.sin_port));   //debug
 		printf("(%s:%4d) : %s\n",                           //debug
 			inet_ntoa(serveur.sin_addr),ntohs(serveur.sin_port),
 			buf_write);
-		ret=write(sock,buf_write,len); //on écrit dans le descripteur standard du socket client (moi)
-		if (ret<=strlen(buf_write)) {
+		ret=write(sock,buf_write,strlen(buf_write)); //on écrit dans le descripteur standard du socket client (moi)
+		if (ret<strlen(buf_write)) {
 			printf("\n%s: erreur dans write (num=%d, mess=%s)\n",
 				argv[0],ret,strerror(errno));
 			continue;
@@ -80,7 +92,7 @@ int ret,len;
 
 		printf(" client %2s: (%s:%4d) recoit de ",id, 
 				inet_ntoa(moi.sin_addr),ntohs(moi.sin_port));
-		ret=read(sock,buf_read,len);	//on lit dans le descripteur standard du socket serveur (serveur)
+		ret=read(sock,buf_read,sizeof(buf_read));	//on lit dans le descripteur standard du socket serveur (serveur)
 		if (ret<=0) {
 			printf("\n%s:  erreur dans read (num=%d, mess=%s)\n",// on traite l'erreur en cas d'échec
 				argv[0],ret,strerror(errno));

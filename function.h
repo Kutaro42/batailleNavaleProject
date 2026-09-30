@@ -69,7 +69,7 @@ struct bateau {
 */
 
 //METHODES & FONCTIONS
-bool la_partie_est_elle_finie(int * nbr_coup_restant, int*fin_de_partie);
+bool la_partie_est_elle_finie(int * nbr_coup_restant, bool*fin_de_partie_);
 bool reste_t_il_un_bateau();
 int dec_nb_coup_restant(int * nbr_coup_restant);
 bool print_nb_coup_restant(char * buff, int nb_coup);
