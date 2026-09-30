@@ -19,8 +19,8 @@ extern int nbr_coup_restant_ ;
 extern char * buff_coup_restant_[TAILLE_BUFF];
 extern _Bool fin_de_partie_ ;
 extern _Bool reste_il_un_bateau_;
-extern _Bool * grille_de_jeu_[50][50];
-extern struct bateau_ bateau_en_jeu;
+extern _Bool * grille_de_jeu_[50][50];//inutile dans ma logique de jeu
+//extern struct bateau_en_jeu_ bateau_en_jeu;
 
 typedef struct position_ {
     int x;
@@ -72,10 +72,10 @@ typedef struct Bateau{
 
 
 
-typedef struct bateau_en_jeu{
+typedef struct bateau_en_jeu_{
     struct Bateau *Bateau_en_jeu[NBRE_FREGATES+NBRE_PORTE_AVIONS];
 
-}bateau_;
+}bateau_en_jeu_;
 
 
 /*
@@ -89,11 +89,14 @@ struct bateau {
 
 _Bool la_partie_est_elle_finie(int * nbr_coup_restant, _Bool*fin_de_partie_);
 
-_Bool reste_t_il_un_bateau(bateau_en_jeu *bateau_en_jeu,_Bool*fin_de_partie_);
+_Bool reste_t_il_un_bateau(bateau_en_jeu_ *bateau_en_jeu,_Bool *reste_il_un_bateau_);
 
 int dec_nb_coup_restant(int * nbr_coup_restant);
 
 _Bool print_nb_coup_restant(char * buff, int nb_coup);
 
+Bateau * trouver_le_bateau_correspondant(position_ * pos, bateau_en_jeu_ * liste_bateau);
 
+int resultat_du_tir(position_ *pos, bateau_en_jeu_ *liste_des_bateau);
 
+_Bool le_bateau_est_il_coulee(Bateau * le_bateau);
