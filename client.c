@@ -9,6 +9,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
+#include "client_fonction.h"
 
 
 #define NBECHANGE 3
@@ -50,27 +51,33 @@ int ret,len;
 	len=sizeof(moi); 
 	getsockname(sock,(struct  sockaddr  *)&moi,&len); //on met à jour les information du socket
 
+
+	//AFFICHER L'ÉCRAN TITRE DU JEU :
+	//int titre =afficher_ecran_titre();
+	
+
+
+
     //Tant que la connection n'est pas interrompue (par un code de sortie du serveur), répéter :
 	while(!connection_closed) {
-		char    buf_read[1<<8], buf_write[5];// 9 caractères en réalité, car le 10ème est remplacé par un zéro (ligne 62) pour gérer la fin de chaine
+		char    buf_read[1<<8], buf_write[6];// 5 caractères en réalité, car le 6ème est remplacé par un zéro (ligne 62) pour gérer la fin de chaine
 
 		// PRISE D'ENTREE CLAVIER POUR LE JOUEUR
 		//on prend le flux clavier et on en écrit le contenu dans le buffer
 		//forme de l'input : [x;y]
-		//char input_buff[1<<3]; // on à théoriquement besoin d'entrer seulement 4 caractères (=16 bits) mais on peux en rajouter pour + de place pour d'éventuel information supp
-		int inputing =read(0,buf_write,sizeof(buf_write));//lit l'entree standard et stocke la chaine traitée dans le buffer write_buf 
 		
+		prendre_les_entree_clavier(buf_write);
 
 		//	REMARQUE IMPORTANTE : -----------------------------------------------------------------------------------------------------------------------------------------------------------
 		//	- Dans l'état actuel, la lecture de l'entrée utilisateur se heurte à un problème majeur : 
-		//	Au delà de 9 caractère écrit dans le flux standard, le surplus reste en mémoir le tampon et le système l'envoie automatiquement pour remplir les itération suivante du buffer.
+		//	Au delà de 5 caractères écrit dans le flux standard, le surplus reste en mémoire-tampon et le système l'envoie automatiquement pour remplir les itération suivante du buffer.
 		//	Ce comportement implique un découpage forcé qui oblige le client à envoyer ces caractères inutiles dans des requêtes à la chaine, ce qui pollue le flux et paralyse le serveur.
 		//	Pour le moment nous nous concentrerons sur le fonctionnement pur de la connection, mais la robustesse du code impliquerait une boucle de vidage qui lit les caractère poubelle et
-		//	les place dans un buffer de vidage avant de vider ce buffer. Le principe étant de vider et remplir le buffer poubelle de ces caractère jusqu'a épuisement de ces derniers.
+		//	les place dans un buffer de vidage avant de vider ce buffer. Le principe étant de vider et remplir le buffer poubelle de ces caractères jusqu'a épuisement de ces derniers.
 		// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-		buf_write[inputing] = '\0'; 
+		
 		//int writting =write(,input_buff,sizeof(inputing));//on fait la taille de inputing pour lire le nbre de caractères réellement lus.
 
         // PARTIE GESTION CLIENT |==> on vise à long terme une gestion sécurisé des entrées clavier du joueur, pour éviter et empêcher les erreurs de saisie avant qu'elles soient envoyées au serveur.

@@ -1,0 +1,138 @@
+#include "function.h"
+
+
+
+//definitition des variables globales :
+int nbr_coup_restant_ = TOTAL_COUPS;
+_Bool fin_de_partie_ = 0;
+_Bool reste_il_un_bateau_ = 1;
+
+
+//formatte un buffer spécifié en argument; renvoie 0 = faux en cas d'erreur, 1=vrai si tout se passe bien
+_Bool print_nb_coup_restant(char * buff, int nb_coup){
+    if(snprintf(buff, TAILLE_BUFF, "Il vous reste %d coups à jouer", nb_coup)){ //correction : taille définie directement par la taille maximum TAILLE_BUFF car sizeof() renvoie une taille de 8bit (comprenhensible car *buf est une adresse sur 8 bit)
+        return 1;
+    }
+    else {
+        return 0; 
+    }
+    
+}
+
+//renvoie le nbr de coups restants
+int dec_nb_coup_restant(int * nbr_coup_restant){
+    *nbr_coup_restant= *nbr_coup_restant-1;
+    return *nbr_coup_restant;
+}
+
+
+//Renvoie 1 si toute les cases du bateau sont détruites, 0 sinon
+_Bool le_bateau_est_il_coulee(Bateau * le_bateau){
+    //code :
+    
+    for(int i=0;0<le_bateau->type;++i){// astuce de conception : j'ai eu l'idée de placer directement la taille active du bateau dans l'enum de sont type, rendant la taille implicite au type de bateau.
+        if(le_bateau->cases_occupee[i]->etat==ACTIVE){ //cette fonction sera appelée très souvent, on cherche donc à éliminer le cas le plus probable en premier
+            //code
+            return 0;
+
+        }
+    }
+    //si pas une seule fois la boucle n'a détecté de case active :
+    return 1; //on est alors certain que le bateau est détruit.
+
+}
+
+//Renvoie le résultat du tir effectué par le joueur depuis le client
+int resultat_du_tir(position_ *pos, bateau_en_jeu_ *liste_des_bateau){
+
+    //variable résultat
+    enum RESULT_SHOOT result; 
+
+    //recherche de l'éventuel bateau
+    Bateau * cible=trouver_le_bateau_correspondant(pos,liste_des_bateau);
+
+    //vérifier si la position correspond à un bateau
+    if(cible == nullptr){          //si aucun bateau n'a cette case (cas le plus probable)
+        result=RATEE;
+    }
+    if(cible != nullptr){          //si une case de bateau est présente
+        result=TOUCHEE;
+        if (le_bateau_est_il_coulee(cible))
+        {
+            result=COULEE;
+        }
+        
+    }
+    return result;
+}
+
+//Identifie le bateau correspondant à la case spécifiée en paramètre, renvoie un pointeur vers la cible si trouvé, nullptr sinon.
+Bateau * trouver_le_bateau_correspondant(position_ * pos, bateau_en_jeu_ * liste_bateau){
+    //stocker l'adresse du bateau trouvé ici
+    Bateau * bateau_cible;
+
+    //code
+    for(int i=0;i<NBRE_FREGATES+NBRE_PORTE_AVIONS;++i){
+        for(int j=0;j<5;++j){
+            if(liste_bateau->Bateau_en_jeu[i]->cases_occupee[j]->position.x == pos->x,
+               liste_bateau->Bateau_en_jeu[i]->cases_occupee[j]->position.y == pos->y
+            ){
+                bateau_cible=liste_bateau->Bateau_en_jeu[i];
+            }
+        }
+    }
+
+    return bateau_cible;
+}
+
+_Bool reste_t_il_un_bateau(bateau_en_jeu_ *bateau_en_jeu,_Bool *reste_il_un_bateau_){
+
+    //parcourir la liste des bateaux
+
+    for(int i=0;i<NBRE_FREGATES+NBRE_PORTE_AVIONS;++i){
+        //code :
+        for(int j=0;j<5;++j){// avec la logique des 5 cases partagées, on n'a plus besoin de s'embêter avec les tailles
+            if(bateau_en_jeu->Bateau_en_jeu[i]->cases_occupee[j]->etat == ACTIVE){ //si on trouve ne serait-ce qu'un seul bateau avec une case encore active, la partie continue
+                *reste_il_un_bateau_=1;
+                return *reste_il_un_bateau_; //bateau trouvé = reprise de la partie
+            }
+
+        }
+
+    }
+
+    //DANS LE CAS OU IL NE RESTE AUCUN BATEAU
+    *reste_il_un_bateau_=0;// on met à jour la variable
+    return *reste_il_un_bateau_; //on renvoie sa valeur comme code de sortie booléen pour traitement
+
+}
+
+// 
+_Bool la_partie_est_elle_finie(int * nbr_coup_restant, _Bool*fin_de_partie_){
+    if(nbr_coup_restant <= 0 && !reste_t_il_un_bateau ){
+        *fin_de_partie_ =1;
+    }
+    else {
+        *fin_de_partie_=0;
+    }
+    return *fin_de_partie_;
+
+}
+
+
+
+
+//Génère les navires et les instancies dans la liste des navire en jeu, renvoie 0 si tout s'est bien passé, 1 en cas d'erreur
+int generation_des_navires(bateau_en_jeu_ *liste_de_bateau){
+    //Bateau *porte_avion=malloc(30);
+
+    return 0; //DEBUG : sert temporairement juste à permettre la compilation pour se concentrer sur les vrai bugs
+
+}
+
+//Places les navires sur la grille de jeu, renvoie 0 si tout s'est bien passé, 1 en cas d'erreur
+int initialisation_de_la_partie(_Bool * grille_de_jeu_[50][50]){
+    //code
+
+    return 0;//DEBUG : sert temporairement juste à permettre la compilation pour se concentrer sur les vrai bugs
+}
