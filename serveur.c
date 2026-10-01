@@ -72,10 +72,10 @@ struct  sockaddr_in serveur; /* SAP du serveur */
 
 		//JEU
 		while (!la_partie_est_elle_finie(&nbr_coup_restant_, &fin_de_partie_)) {
-			char    buf_read[5], buf_write[24]="[STATUT ; COUPS RESTANT]";// pour nos premiers test 24 caractère sont suffisant, mais on se garde la possibilité d'en rajouter
+			char    buf_read[5], buf_write[25]="[STATUT ; COUPS RESTANT]\0";// pour nos premiers test 24 caractère sont suffisant, mais on se garde la possibilité d'en rajouter 1 pour le \0
 
 
-			buf_read[ret] = '\0'; //POUR GERER LA DECOUPE DU MESSAGE
+			//buf_read[ret] = '\0'; //POUR GERER LA DECOUPE DU MESSAGE
 
 
 			// ON LIT LE MSG DU CLIENT
