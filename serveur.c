@@ -14,7 +14,7 @@
 #include <netinet/in.h>  // Pour sockaddr_in, htons, ntohs, INADDR_ANY
 #include <arpa/inet.h>   // Pour inet_ntoa
 
-#include "function.h"
+#include "serveur_fonction.h"
 
 #define NBECHANGE 3
 
@@ -75,7 +75,7 @@ struct  sockaddr_in serveur; /* SAP du serveur */
 			char    buf_read[5], buf_write[24]="[STATUT ; COUPS RESTANT]";// pour nos premiers test 24 caractère sont suffisant, mais on se garde la possibilité d'en rajouter
 
 
-			//buf_read[ret] = '\0'; POUR GERER LA DECOUPE DU MESSAGE
+			buf_read[ret] = '\0'; //POUR GERER LA DECOUPE DU MESSAGE
 
 
 			// ON LIT LE MSG DU CLIENT

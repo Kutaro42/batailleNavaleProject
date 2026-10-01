@@ -53,10 +53,11 @@ void prendre_les_entree_clavier(char *buf_write){
             printf("Format invalide. Veuillez entrer deux nombres séparés par un point-virgule.\n");
 
             //Méthode bourrine pour vider le buffer jusqu'a ce qu'il n'y ait plus de caractères-poubelles dans le buffer-tampon (=éviter de faire crash la saisie quand un joueur écrit de très longue chaines)
-            if (strchr(buf_write, '\0') == NULL) {
+            if (strchr(buf_write, '\n') == NULL) {
                 int c;
-                while ((c = getchar()) != '\n' && c != EOF);// Tant que le caractère pris dans le buffer n'est pas un saut de ligne ou un jeton EOF (=fin du msg quand le joueur valide en appuyant sur la touche entrée)
+                while ((c = getchar()) != '\n' && c != EOF); // Tant que le caractère pris dans le buffer n'est pas un saut de ligne ou un jeton EOF (=fin du msg quand le joueur valide en appuyant sur la touche entrée)
             }
+            
         }
     }
 
