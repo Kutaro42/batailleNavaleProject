@@ -53,7 +53,7 @@ int ret,len;
 
 
 	//AFFICHER L'ÉCRAN TITRE DU JEU :
-	//int titre =afficher_ecran_titre();
+	int titre =afficher_ecran_titre();
 	
 
 
