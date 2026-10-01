@@ -19,7 +19,7 @@ void prendre_les_entree_clavier(char *buf_write){
     while (!saisie_valide) {
         printf("Entrez les coordonnées de votre tir (Ex: X Y -> 5 3) : ");
         // Lecture sécurisée de la ligne tapée au clavier
-        if (fgets(buf_write, 20, stdin) == NULL) {
+        if (fgets(buf_write, 20, stdin) == NULL) { //j'ai mit 20 au cas ou, mais dans le traitement cela n'aura aucune importance, car on ne se préoccupe que des 6 premiers caractères.
             continue;
         }
 
@@ -51,6 +51,12 @@ void prendre_les_entree_clavier(char *buf_write){
             }
         } else {
             printf("Format invalide. Veuillez entrer deux nombres séparés par un point-virgule.\n");
+
+            //Méthode bourrine pour vider le buffer jusqu'a ce qu'il n'y ait plus de caractères-poubelles dans le buffer-tampon (=éviter de faire crash la saisie quand un joueur écrit de très longue chaines)
+            if (strchr(buf_write, '\0') == NULL) {
+                int c;
+                while ((c = getchar()) != '\n' && c != EOF);// Tant que le caractère pris dans le buffer n'est pas un saut de ligne ou un jeton EOF (=fin du msg quand le joueur valide en appuyant sur la touche entrée)
+            }
         }
     }
 
