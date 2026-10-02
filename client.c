@@ -66,7 +66,10 @@ int ret,len;
 		//on prend le flux clavier et on en écrit le contenu dans le buffer
 		//forme de l'input : [x;y]
 		
-		prendre_les_entree_clavier(buf_write);
+		position_ position_visee;
+		if(prendre_les_entree_clavier(buf_write,position_visee)){
+			continue;
+		}
 
 		//	REMARQUE IMPORTANTE : -----------------------------------------------------------------------------------------------------------------------------------------------------------
 		//	- Dans l'état actuel, la lecture de l'entrée utilisateur se heurte à un problème majeur : 
