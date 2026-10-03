@@ -124,15 +124,58 @@ _Bool la_partie_est_elle_finie(int * nbr_coup_restant, _Bool*fin_de_partie_){
 
 //Génère les navires et les instancies dans la liste des navire en jeu, renvoie 0 si tout s'est bien passé, 1 en cas d'erreur
 int generation_des_navires(bateau_en_jeu_ *liste_de_bateau){
-    //Bateau *porte_avion=malloc(30);
+if (liste_de_bateau == NULL) return 1;
 
-    return 0; //DEBUG : sert temporairement juste à permettre la compilation pour se concentrer sur les vrai bugs
+    int index = 0;
 
+    // Instanciation des portes-avions (taille 5)
+    for (int i = 0; i < NBRE_PORTE_AVIONS; i++) {
+        Bateau *b = (Bateau *)malloc(sizeof(Bateau));
+        if (b == NULL) return 1;
+
+        b->type = PORTE_AVION; 
+
+        for (int j = 0; j < 5; j++) {
+            b->cases_occupee[j] = (Case *)malloc(sizeof(Case));
+            if (b->cases_occupee[j] == NULL) return 1;
+            b->cases_occupee[j]->etat = ACTIVE;
+        }
+        liste_de_bateau->Bateau_en_jeu[index++] = b;
+    }
+
+    // Instanciation des frégates (taille 3 active + 2 cases inactives)
+    for (int i = 0; i < NBRE_FREGATES; i++) {
+        Bateau *b = (Bateau *)malloc(sizeof(Bateau));
+        if (b == NULL) return 1;
+
+        b->type = FREGATE; // Type = 3
+
+        for (int j = 0; j < 5; j++) {
+            b->cases_occupee[j] = (Case *)malloc(sizeof(Case));
+            if (b->cases_occupee[j] == NULL) return 1;
+
+            if (j < 3) {
+                b->cases_occupee[j]->etat = ACTIVE;
+            } else {
+                b->cases_occupee[j]->etat = NON_ACTIVE;
+            }
+        }
+        liste_de_bateau->Bateau_en_jeu[index++] = b;
+    }
+
+    return 0;
 }
 
 //Places les navires sur la grille de jeu, renvoie 0 si tout s'est bien passé, 1 en cas d'erreur
 int initialisation_de_la_partie(_Bool * grille_de_jeu_[50][50]){
-    //code
 
-    return 0;//DEBUG : sert temporairement juste à permettre la compilation pour se concentrer sur les vrai bugs
+    if (grille_de_jeu_ != NULL) {
+        for (int i = 0; i < 50; i++) {
+            for (int j = 0; j < 50; j++) {
+                grille_de_jeu_[i][j] = NULL;
+            }
+        }
+    }
+
+    return 0; // Succès
 }
