@@ -22,10 +22,12 @@ extern _Bool reste_il_un_bateau_;
 extern _Bool * grille_de_jeu_[50][50];//inutile dans ma logique de jeu
 //extern struct bateau_en_jeu_ bateau_en_jeu;
 
-typedef struct position_ {
+typedef struct{
     int x;
     int y;
-}position_;
+} __attribute__((packed)) position_;
+
+
 
 //   Résultat renvoyé par le serveur au client
 enum RESULT_SHOOT{
@@ -46,7 +48,7 @@ enum STATE_CASE{
 
 typedef struct Case {
     enum STATE_CASE etat;
-    struct position_ position;
+    position_ position;
 }Case;
 
 //------------------------------------------------------
@@ -101,3 +103,8 @@ Bateau * trouver_le_bateau_correspondant(position_ * pos, bateau_en_jeu_ * liste
 int resultat_du_tir(position_ *pos, bateau_en_jeu_ *liste_des_bateau);
 
 _Bool le_bateau_est_il_coulee(Bateau * le_bateau);
+
+//
+_Bool generation_des_navires(bateau_en_jeu_ *liste_de_bateau);
+
+_Bool liberation_memoire();

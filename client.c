@@ -72,7 +72,7 @@ int ret,len;
 		}
 
 		//	REMARQUE IMPORTANTE : -----------------------------------------------------------------------------------------------------------------------------------------------------------
-		//	- Dans l'état actuel, la lecture de l'entrée utilisateur se heurte à un problème majeur : 
+		//	- Dans un état antérieur, la lecture de l'entrée utilisateur se heurtait à un problème majeur : 
 		//	Au delà de 5 caractères écrit dans le flux standard, le surplus reste en mémoire-tampon et le système l'envoie automatiquement pour remplir les itération suivante du buffer.
 		//	Ce comportement implique un découpage forcé qui oblige le client à envoyer ces caractères inutiles dans des requêtes à la chaine, ce qui pollue le flux et paralyse le serveur.
 		//	Pour le moment nous nous concentrerons sur le fonctionnement pur de la connection, mais la robustesse du code impliquerait une boucle de vidage qui lit les caractère poubelle et
@@ -91,12 +91,25 @@ int ret,len;
 		printf("(%s:%4d) : %s\n",                           //debug
 			inet_ntoa(serveur.sin_addr),ntohs(serveur.sin_port),
 			buf_write);
+
+		// Au lieu de : ret = write(sock, buf_write, strlen(buf_write));
+		// On envoie directement les 8 octets de la structure position_ :
+
+		ret = write(sock, &position_visee, sizeof(position_)); 
+
+		if (ret < sizeof(position_)) {
+			printf("\n%s: erreur dans write binaire (num=%d, mess=%s)\n",
+				argv[0], ret, strerror(errno));
+			continue;
+		}
+/*
 		ret=write(sock,buf_write,strlen(buf_write)); //on écrit dans le descripteur standard du socket client (moi)
 		if (ret<strlen(buf_write)) {
 			printf("\n%s: erreur dans write (num=%d, mess=%s)\n",
 				argv[0],ret,strerror(errno));
 			continue;
 		}
+*/
 
         // PARTIE GESTION SERVEUR
 

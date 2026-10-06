@@ -8,7 +8,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
-//STRUCTURE DE DONNÉES
+//STRUCTURE DE DONNÉES (=la même que le serveur)
 typedef struct{ //l'attribut "packed" supprime la mémoire vide qui pourrait se glisser entre les variables (=padding)
     int x;//4 octets
     int y;

@@ -55,8 +55,23 @@ struct  sockaddr_in serveur; /* SAP du serveur */
    }
 
    //CHARGEMENT ET INITIALISATION DES PARAMETRES DE JEU
+   
+   //liste des bateaux en jeu
+   bateau_en_jeu_ liste_des_bateaux;
 
    // CHARGER LA MAP :
+
+    // 2. On donne l'ADRESSE de la structure avec le symbole '&'
+    // La fonction reçoit bien un pointeur (bateau_en_jeu_ *)
+    if (generation_des_navires(&liste_des_bateaux) == 0) {
+        printf("Les navires ont été générés avec succès !\n");
+    }
+   //int grille_de_jeu_[50][50];
+   //int grille_de_jeu_[50][50] =malloc(sizeof())
+
+
+   //generation_des_navires(bateau_en_jeu_ *liste_de_bateau);
+   //initialisation_de_la_partie(_Bool * grille_de_jeu_[50][50]);
 
 
 
@@ -65,10 +80,11 @@ struct  sockaddr_in serveur; /* SAP du serveur */
 		struct  sockaddr_in client; /* SAP du client */
 		int     len=sizeof(client);
 		int     sock_pipe;          /* socket de dialogue */
-		int     ret,nb_question;
+		int     ret,nb_question; //ret lit le format binaire dans laquelle la position reçue est encodée (=plus simple et performant), nb_question sert au dénombrement des essais restants
 
     	sock_pipe = accept(sock,(struct sockaddr*)&client,(socklen_t*)&len); //on accepte le traitement des demande du client courant
 
+		position_ tir_client; //stocker la position reçu du client
 
 		//JEU
 		while (!la_partie_est_elle_finie(&nbr_coup_restant_, &fin_de_partie_)) {
@@ -79,7 +95,7 @@ struct  sockaddr_in serveur; /* SAP du serveur */
 
 
 			// ON LIT LE MSG DU CLIENT
-			ret=read(sock_pipe,buf_read,sizeof(buf_read));
+			ret=read(sock_pipe,&tir_client,sizeof(position_));
 			if (ret<=0) {
 				printf("%s: read=%d: %s\n",argv[0],ret,
 					strerror(errno));
@@ -91,14 +107,11 @@ struct  sockaddr_in serveur; /* SAP du serveur */
 
 			//TRAITEMENT DU MSG CLIENT
 
-			//1) récupérer les deux valeurs numérique séparée par un point-virgule
-			//2) vérifier si une case de bateau existe à la position correspondante, si active (renvoi "touché")
-			//3) démarrer le système de questions-réponses client-serveur :
+			//affichage DEBUG
+			printf("[Serveur] Tir reçu du joueur ! Coordonnées : X = %d, Y = %d\n", tir_client.x, tir_client.y);
 
-
-
-
-
+			//vérifier si une case de bateau existe à la position correspondante, si active (renvoi "touché")
+			int res =resultat_du_tir(&tir_client, &liste_des_bateaux)
 
 
 
@@ -118,6 +131,8 @@ struct  sockaddr_in serveur; /* SAP du serveur */
 			sleep(2);
 		}
 		close(sock_pipe);
+		//nettoyer la liste des bateaux allouée
+		liberation_memoire();
 	}
 	return 0;
 }
