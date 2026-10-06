@@ -10,42 +10,23 @@ _Bool prendre_les_entree_clavier(char *buf_write,position_ *tir_joueur){
 	//int inputing =read(0,buf_write,sizeof(buf_write));//lit l'entree standard et stocke la chaine traitée dans le buffer write_buf 
 	//buf_write[inputing] = '\0'; 
 
+    _Bool saisie_correcte = 0; //au départ, on par du principe que c'est incorrecte
     // ALGORITHME DE SAISIE ET DE VALIDATION
-    while (traitement_entree_clavier(buf_write,tir_joueur)) {
+    do{
         printf("Entrez les coordonnées de votre tir (Ex: X Y -> 5 3) : ");
         // Lecture sécurisée de la ligne tapée au clavier
         if (fgets(buf_write, 20, stdin) == NULL) { //j'ai mit 20 au cas ou, mais dans le traitement cela n'aura aucune importance, car on ne se préoccupe que des 6 premiers caractères.
-            continue;
+            return 1;
         }
+        saisie_correcte = traitement_entree_clavier(buf_write,tir_joueur);
 
-    }
-    return 1;
-
-}
-
-
-_Bool traitement_entree_clavier(char *buff,position_ *pos){
-
- 
-    fflush(stdout); // Force l'affichage immédiat du texte à l'écran
-
-
-    // Éliminer le '\n' à la fin de la chaîne s'il est présent
-    buf_write[strcspn(buf_write, "\n")] = '\0';
-
-    // Si l'utilisateur a juste appuyé sur Entrée (chaîne vide), on passe
-    if (strlen(buf_write) == 0) {
-        continue;
-    }
-
-    //On vérifie que l'entrée est traitable. si oui, on la parque dans une struct position et on l'envoie sous forme binaire au serveur pour un traitement plus efficace
-    return entree_valide(buff,pos);
+    }while (!saisie_correcte); //on choisit le do...while pour permettre de prendre la toute p^remière entrée de l'utilisateur avant de lancer la vérif 
+    return 0;
 
 }
-
 
 //vérifie qu'une entrée clavier est valide avant l'envoie au serveur pour traitement
-_Bool entree_valide(char *buff,position_ *pos){
+_Bool entree_valide(char *buf_write,position_ *pos){
 
     //def des variables d'usage :
     int x_saisi, y_saisi;
@@ -60,8 +41,8 @@ _Bool entree_valide(char *buff,position_ *pos){
         if (x_saisi >= 0 && x_saisi < 50 && y_saisi >= 0 && y_saisi < 50) {
             
             // Remplissage de la structure à partir des valeurs validées
-            *pos.x = x_saisi;
-            *pos.y = y_saisi;
+            pos->x = x_saisi;
+            pos->y = y_saisi;
             saisie_valide = 1; // On valide pour sortir de la boucle
             
         } else {
@@ -77,5 +58,25 @@ _Bool entree_valide(char *buff,position_ *pos){
         }
         
     }
-    
+    return saisie_valide;
 }
+_Bool traitement_entree_clavier(char *buf_write,position_ *pos){
+
+ 
+    fflush(stdout); // Force l'affichage immédiat du texte à l'écran
+
+
+    // Éliminer le '\n' à la fin de la chaîne s'il est présent
+    buf_write[strcspn(buf_write, "\n")] = '\0';
+
+    // Si l'utilisateur a juste appuyé sur Entrée (chaîne vide), on passe
+    /*if (strlen(buf_write) == 0) {
+        return 0;
+    }*/
+
+    //On vérifie que l'entrée est traitable. si oui, on la parque dans une struct position et on l'envoie sous forme binaire au serveur pour un traitement plus efficace
+    return entree_valide(buf_write,pos);
+
+}
+
+

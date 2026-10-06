@@ -67,7 +67,7 @@ int ret,len;
 		//forme de l'input : [x;y]
 		
 		position_ position_visee;
-		if(prendre_les_entree_clavier(buf_write,position_visee)){
+		if(prendre_les_entree_clavier(buf_write,&position_visee)){
 			continue;
 		}
 
