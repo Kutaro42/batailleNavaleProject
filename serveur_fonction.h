@@ -109,3 +109,5 @@ _Bool le_bateau_est_il_coulee(Bateau * le_bateau);
 _Bool generation_des_navires(bateau_en_jeu_ *liste_de_bateau);
 
 _Bool liberation_memoire(bateau_en_jeu_ *ma_liste);
+
+_Bool initialisation_de_la_partie(_Bool * grille_de_jeu_[50][50], bateau_en_jeu_ *liste_de_bateau);

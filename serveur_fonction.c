@@ -184,7 +184,7 @@ if (grille_de_jeu_ == NULL || liste_de_bateau == NULL) return 1;
     for (int i = 0; i < NBRE_PORTE_AVIONS + NBRE_FREGATES; i++) {
         Bateau *b = liste_de_bateau->Bateau_en_jeu[i];
         if (b == NULL) return 1;
-        int taille = 0
+        int taille = 0;
         if(b->type == PORTE_AVION){
             taille = 5;
         }
@@ -222,7 +222,8 @@ if (grille_de_jeu_ == NULL || liste_de_bateau == NULL) return 1;
                 b->cases_occupee[j]->position.y = pos_y;
                 b->cases_occupee[j]->etat = ACTIVE;
 
-                grille_de_jeu_[pos_x][pos_y] = (_Bool *)1;
+                static _Bool case_occupee = 1;
+                grille_de_jeu_[pos_x][pos_y] = &case_occupee;
             } else {
                 b->cases_occupee[j]->position.x = -1;
                 b->cases_occupee[j]->position.y = -1;
