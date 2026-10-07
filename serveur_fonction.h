@@ -7,6 +7,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <time.h>
 
 
 #define TOTAL_COUPS 50

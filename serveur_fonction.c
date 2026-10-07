@@ -166,20 +166,70 @@ if (liste_de_bateau == NULL) return 1;
 
 //Places les navires sur la grille de jeu, renvoie 0 si tout s'est bien passé, 1 en cas d'erreur
 _Bool initialisation_de_la_partie(_Bool * grille_de_jeu_[50][50]){
+if (grille_de_jeu_ == NULL || liste_de_bateau == NULL) return 1;
 
-    //générer des bateaux sur la carte :
-    
+    for (int i = 0; i < 50; i++) {
+        for (int j = 0; j < 50; j++) {
+            grille_de_jeu_[i][j] = 0;
+        }
+    }
 
-    /*
-    if (grille_de_jeu_ != NULL) {
-        for (int i = 0; i < 50; i++) {
-            for (int j = 0; j < 50; j++) {
-                grille_de_jeu_[i][j] = NULL;
+    // Initialisation du générateur de nombres aléatoires
+    static int rand_init = 0;
+    if (!rand_init) {
+        srand(time(NULL));
+        rand_init = 1;
+    }
+
+    for (int i = 0; i < NBRE_PORTE_AVIONS + NBRE_FREGATES; i++) {
+        Bateau *b = liste_de_bateau->Bateau_en_jeu[i];
+        if (b == NULL) return 1;
+        int taille = 0
+        if(b->type == PORTE_AVION){
+            taille = 5;
+        }
+        else{
+            taille = 3;
+        }
+
+        int orientation = rand() % 2;                  // 0 = Horizontal, 1 = Vertical
+        int x, y;
+
+        // Génèration des coordonnées
+        if (orientation == 0) {
+            x = rand() % (50 - taille);
+            y = rand() % 50;
+        } else {
+            x = rand() % 50;
+            y = rand() % (50 - taille);
+        }
+
+        for (int j = 0; j < 5; j++) {
+            if (j < taille) {
+                int pos_x ;
+                int pos_y ;
+
+                if (orientation == 0) {
+                    pos_x = x + j;
+                    pos_y = y;
+                } 
+                else { 
+                    pos_x = x;
+                    pos_y = y + j;
+                }
+
+                b->cases_occupee[j]->position.x = pos_x;
+                b->cases_occupee[j]->position.y = pos_y;
+                b->cases_occupee[j]->etat = ACTIVE;
+
+                grille_de_jeu_[pos_x][pos_y] = (_Bool *)1;
+            } else {
+                b->cases_occupee[j]->position.x = -1;
+                b->cases_occupee[j]->position.y = -1;
+                b->cases_occupee[j]->etat = NON_ACTIVE;
             }
         }
     }
-*/
-
 
     return 0; // Succès
 }
