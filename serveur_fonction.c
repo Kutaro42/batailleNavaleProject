@@ -52,10 +52,10 @@ int resultat_du_tir(position_ *pos, bateau_en_jeu_ *liste_des_bateau){
     Bateau * cible=trouver_le_bateau_correspondant(pos,liste_des_bateau);
 
     //vérifier si la position correspond à un bateau
-    if(cible == nullptr){          //si aucun bateau n'a cette case (cas le plus probable)
+    if(cible == NULL){          //si aucun bateau n'a cette case (cas le plus probable)
         result=RATEE;
     }
-    if(cible != nullptr){          //si une case de bateau est présente
+    if(cible != NULL){          //si une case de bateau est présente
         result=TOUCHEE;
         if (le_bateau_est_il_coulee(cible))
         {
@@ -74,7 +74,7 @@ Bateau * trouver_le_bateau_correspondant(position_ * pos, bateau_en_jeu_ * liste
     //code
     for(int i=0;i<NBRE_FREGATES+NBRE_PORTE_AVIONS;++i){
         for(int j=0;j<5;++j){
-            if(liste_bateau->Bateau_en_jeu[i]->cases_occupee[j]->position.x == pos->x,
+            if(liste_bateau->Bateau_en_jeu[i]->cases_occupee[j]->position.x == pos->x &&
                liste_bateau->Bateau_en_jeu[i]->cases_occupee[j]->position.y == pos->y
             ){
                 bateau_cible=liste_bateau->Bateau_en_jeu[i];
@@ -108,8 +108,10 @@ _Bool reste_t_il_un_bateau(bateau_en_jeu_ *bateau_en_jeu,_Bool *reste_il_un_bate
 }
 
 // 
-_Bool la_partie_est_elle_finie(int * nbr_coup_restant, _Bool*fin_de_partie_){
-    if(nbr_coup_restant <= 0 && !reste_t_il_un_bateau ){
+_Bool la_partie_est_elle_finie(int * nbr_coup_restant, _Bool*fin_de_partie_, bateau_en_jeu_ *liste_des_bateaux){
+    _Bool encore_des_bateaux = 1;
+    reste_t_il_un_bateau(liste_des_bateaux, &encore_des_bateaux);
+    if(*nbr_coup_restant <= 0 || !encore_des_bateaux){
         *fin_de_partie_ =1;
     }
     else {
@@ -165,7 +167,7 @@ if (liste_de_bateau == NULL) return 1;
 }
 
 //Places les navires sur la grille de jeu, renvoie 0 si tout s'est bien passé, 1 en cas d'erreur
-_Bool initialisation_de_la_partie(_Bool * grille_de_jeu_[50][50]){
+_Bool initialisation_de_la_partie(_Bool * grille_de_jeu_[50][50], bateau_en_jeu_ *liste_de_bateau){
 if (grille_de_jeu_ == NULL || liste_de_bateau == NULL) return 1;
 
     for (int i = 0; i < 50; i++) {

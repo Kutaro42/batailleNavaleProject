@@ -87,7 +87,7 @@ struct  sockaddr_in serveur; /* SAP du serveur */
 		position_ tir_client; //stocker la position reçu du client
 
 		//JEU
-		while (!la_partie_est_elle_finie(&nbr_coup_restant_, &fin_de_partie_)) {
+		while (!la_partie_est_elle_finie(&nbr_coup_restant_, &fin_de_partie_, &liste_des_bateaux)) {
 			char    buf_read[5], buf_write[25]="[STATUT ; COUPS RESTANT]\0";// pour nos premiers test 24 caractère sont suffisant, mais on se garde la possibilité d'en rajouter 1 pour le \0
 
 
@@ -101,9 +101,7 @@ struct  sockaddr_in serveur; /* SAP du serveur */
 					strerror(errno));
 				break;
 			}
-			printf("serveur %s recu de (%s,%4d) : %s\n",id,
-				inet_ntoa(client.sin_addr),
-				ntohs(client.sin_port),buf_read);
+			printf("serveur %s recu de (%s,%4d)\n", id, inet_ntoa(client.sin_addr), ntohs(client.sin_port));
 
 			//TRAITEMENT DU MSG CLIENT
 
@@ -112,7 +110,7 @@ struct  sockaddr_in serveur; /* SAP du serveur */
 
 			//vérifier si une case de bateau existe à la position correspondante, si active (renvoi "touché")
 			int res =resultat_du_tir(&tir_client, &liste_des_bateaux);
-
+			(void)res;
 
 
 			//--------------------------------------------------------------------------
