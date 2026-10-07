@@ -111,7 +111,7 @@ struct  sockaddr_in serveur; /* SAP du serveur */
 			printf("[Serveur] Tir reçu du joueur ! Coordonnées : X = %d, Y = %d\n", tir_client.x, tir_client.y);
 
 			//vérifier si une case de bateau existe à la position correspondante, si active (renvoi "touché")
-			int res =resultat_du_tir(&tir_client, &liste_des_bateaux)
+			int res =resultat_du_tir(&tir_client, &liste_des_bateaux);
 
 
 
@@ -132,7 +132,7 @@ struct  sockaddr_in serveur; /* SAP du serveur */
 		}
 		close(sock_pipe);
 		//nettoyer la liste des bateaux allouée
-		liberation_memoire();
+		liberation_memoire(&liste_des_bateaux);
 	}
 	return 0;
 }

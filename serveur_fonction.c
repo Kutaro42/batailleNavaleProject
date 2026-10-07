@@ -120,7 +120,7 @@ _Bool la_partie_est_elle_finie(int * nbr_coup_restant, _Bool*fin_de_partie_){
 }
 
 
-//Alloue l'espace mémoire nécéssaire à la création d'une liste de bateau en jeu les instancies, renvoie 0 si tout s'est bien passé, 1 en cas d'erreur
+//Alloue l'espace mémoire nécéssaire à la création d'une liste de bateau en jeu : les instancies, renvoie 0 si tout s'est bien passé, 1 en cas d'erreur
 _Bool generation_des_navires(bateau_en_jeu_ *liste_de_bateau){
 if (liste_de_bateau == NULL) return 1;
 
@@ -167,6 +167,10 @@ if (liste_de_bateau == NULL) return 1;
 //Places les navires sur la grille de jeu, renvoie 0 si tout s'est bien passé, 1 en cas d'erreur
 _Bool initialisation_de_la_partie(_Bool * grille_de_jeu_[50][50]){
 
+    //générer des bateaux sur la carte :
+    
+
+    /*
     if (grille_de_jeu_ != NULL) {
         for (int i = 0; i < 50; i++) {
             for (int j = 0; j < 50; j++) {
@@ -174,17 +178,19 @@ _Bool initialisation_de_la_partie(_Bool * grille_de_jeu_[50][50]){
             }
         }
     }
+*/
+
 
     return 0; // Succès
 }
 
-_Bool liberation_memoire(){
+_Bool liberation_memoire(bateau_en_jeu_ *ma_liste){
     for (int i = 0; i < (NBRE_FREGATES + NBRE_PORTE_AVIONS); i++) {
-        if (ma_liste.Bateau_en_jeu[i] != NULL) {
+        if (ma_liste->Bateau_en_jeu[i] != NULL) {
             for (int j = 0; j < 5; j++) {
-                free(ma_liste.Bateau_en_jeu[i]->cases_occupee[j]);
+                free(ma_liste->Bateau_en_jeu[i]->cases_occupee[j]);
             }
-            free(ma_liste.Bateau_en_jeu[i]);
+            free(ma_liste->Bateau_en_jeu[i]);
         }
     }
 }

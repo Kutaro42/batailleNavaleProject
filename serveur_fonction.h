@@ -107,4 +107,4 @@ _Bool le_bateau_est_il_coulee(Bateau * le_bateau);
 //
 _Bool generation_des_navires(bateau_en_jeu_ *liste_de_bateau);
 
-_Bool liberation_memoire();
+_Bool liberation_memoire(bateau_en_jeu_ *ma_liste);
