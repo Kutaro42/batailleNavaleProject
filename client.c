@@ -60,9 +60,9 @@ int ret,len;
 
     //Tant que la connection n'est pas interrompue (par un code de sortie du serveur), répéter :
 	while(!connection_closed) {
-		char    buf_read[1<<8], buf_write[6];// 5 caractères en réalité, car le 6ème est remplacé par un zéro (ligne 62) pour gérer la fin de chaine
+		char    buf_read[1<<8], buf_write[1<<6];// 5 caractères en réalité, car le 6ème est remplacé par un zéro (ligne 62) pour gérer la fin de chaine
 
-		ReponseServeur * reponse;
+		ReponseServeur reponse;
 
 		// PRISE D'ENTREE CLAVIER POUR LE JOUEUR
 		//on prend le flux clavier et on en écrit le contenu dans le buffer
@@ -130,7 +130,7 @@ int ret,len;
 
 
 		//formatter le buffer pour afficher une chaine propre :
-		interpreter_la_reponse_serveur(buf_read, reponse);
+		interpreter_la_reponse_serveur(buf_read, &reponse);
 
 		//afficher le résultat :
 		printf("(%s:%4d) : %s\n",inet_ntoa(serveur.sin_addr),
