@@ -68,6 +68,11 @@ struct  sockaddr_in serveur; /* SAP du serveur */
     }
    //int grille_de_jeu_[50][50];
    //int grille_de_jeu_[50][50] =malloc(sizeof())
+   // 2. Déclarer la grille de jeu et positionner les navires !
+    _Bool *grille_de_jeu_[50][50]; 
+    if (initialisation_de_la_partie(grille_de_jeu_, &liste_des_bateaux) == 0) {
+        printf("Les navires ont été positionnés sur la grille avec succès !\n");
+    }
 
 
    //generation_des_navires(bateau_en_jeu_ *liste_de_bateau);

@@ -30,7 +30,7 @@ int dec_nb_coup_restant(int * nbr_coup_restant){
 _Bool le_bateau_est_il_coulee(Bateau * le_bateau){
     //code :
     
-    for(int i=0;0<le_bateau->type;++i){// astuce de conception : j'ai eu l'idée de placer directement la taille active du bateau dans l'enum de sont type, rendant la taille implicite au type de bateau.
+    for(int i=0;i<le_bateau->type;++i){// astuce de conception : j'ai eu l'idée de placer directement la taille active du bateau dans l'enum de sont type, rendant la taille implicite au type de bateau.
         if(le_bateau->cases_occupee[i]->etat==ACTIVE){ //cette fonction sera appelée très souvent, on cherche donc à éliminer le cas le plus probable en premier
             //code
             return 0;
@@ -69,7 +69,7 @@ int resultat_du_tir(position_ *pos, bateau_en_jeu_ *liste_des_bateau){
 //Identifie le bateau correspondant à la case spécifiée en paramètre, renvoie un pointeur vers la cible si trouvé, nullptr sinon.
 Bateau * trouver_le_bateau_correspondant(position_ * pos, bateau_en_jeu_ * liste_bateau){
     //stocker l'adresse du bateau trouvé ici
-    Bateau * bateau_cible;
+    Bateau * bateau_cible=NULL;
 
     //code
     for(int i=0;i<NBRE_FREGATES+NBRE_PORTE_AVIONS;++i){
