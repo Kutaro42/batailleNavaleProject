@@ -15,13 +15,6 @@
 #define NBRE_PORTE_AVIONS 1
 #define NBRE_FREGATES 1
 
-//DECLARATION DES VARIABLES GLOBALES
-extern int nbr_coup_restant_ ;
-extern char * buff_coup_restant_[TAILLE_BUFF];
-extern _Bool fin_de_partie_ ;
-extern _Bool reste_il_un_bateau_;
-extern _Bool * grille_de_jeu_[50][50];//inutile dans ma logique de jeu
-//extern struct bateau_en_jeu_ bateau_en_jeu;
 
 typedef struct{
     int x;
@@ -115,4 +108,4 @@ _Bool generation_des_navires(bateau_en_jeu_ *liste_de_bateau);
 
 _Bool liberation_memoire(bateau_en_jeu_ *ma_liste);
 
-_Bool initialisation_de_la_partie(_Bool * grille_de_jeu_[50][50], bateau_en_jeu_ *liste_de_bateau);
+_Bool initialisation_de_la_partie(bateau_en_jeu_ *liste_de_bateau);

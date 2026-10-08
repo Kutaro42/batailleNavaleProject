@@ -166,15 +166,10 @@ if (liste_de_bateau == NULL) return 1;
     return 0;
 }
 
-//Places les navires sur la grille de jeu, renvoie 0 si tout s'est bien passé, 1 en cas d'erreur
-_Bool initialisation_de_la_partie(_Bool * grille_de_jeu_[50][50], bateau_en_jeu_ *liste_de_bateau){
-if (grille_de_jeu_ == NULL || liste_de_bateau == NULL) return 1;
+//Attribue aux navires des coordonées sur la grille de jeu fictive, renvoie 0 si tout s'est bien passé, 1 en cas d'erreur
+_Bool initialisation_de_la_partie(bateau_en_jeu_ *liste_de_bateau){
+if (liste_de_bateau == NULL) return 1;
 
-    for (int i = 0; i < 50; i++) {
-        for (int j = 0; j < 50; j++) {
-            grille_de_jeu_[i][j] = 0;
-        }
-    }
 
     // Initialisation du générateur de nombres aléatoires
     static int rand_init = 0;
@@ -224,8 +219,6 @@ if (grille_de_jeu_ == NULL || liste_de_bateau == NULL) return 1;
                 b->cases_occupee[j]->position.y = pos_y;
                 b->cases_occupee[j]->etat = ACTIVE;
 
-                static _Bool case_occupee = 1;
-                grille_de_jeu_[pos_x][pos_y] = &case_occupee;
             } else {
                 b->cases_occupee[j]->position.x = -1;
                 b->cases_occupee[j]->position.y = -1;
