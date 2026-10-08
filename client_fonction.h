@@ -16,9 +16,21 @@ typedef struct{ //l'attribut "packed" supprime la mémoire vide qui pourrait se 
 
 //2 int = 8 octets en mémoire
 
+//   Résultat renvoyé par le serveur au client
+enum RESULT_SHOOT{
+    RATEE,
+    TOUCHEE,
+    COULEE
+};
+
+typedef struct{
+    enum RESULT_SHOOT resultat;
+    int coup_restant ;
+} __attribute__((packed)) ReponseServeur;
 
 // METHODES ET FONCTIONS
 
 extern int afficher_ecran_titre();
 extern _Bool prendre_les_entree_clavier(char *buf_write, position_* tir_joueur);
 extern _Bool traitement_entree_clavier(char *buff,position_* tir_joueur);
+extern _Bool interpreter_la_reponse_serveur(char * buff, ReponseServeur * reponse);

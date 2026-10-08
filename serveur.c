@@ -75,6 +75,7 @@ struct  sockaddr_in serveur; /* SAP du serveur */
     }
 
 
+
    //generation_des_navires(bateau_en_jeu_ *liste_de_bateau);
    //initialisation_de_la_partie(_Bool * grille_de_jeu_[50][50]);
 
@@ -115,7 +116,7 @@ struct  sockaddr_in serveur; /* SAP du serveur */
 
 			//vérifier si une case de bateau existe à la position correspondante, si active (renvoi "touché")
 			int res =resultat_du_tir(&tir_client, &liste_des_bateaux);
-			(void)res;
+			//(void)res;
 
 
 			//--------------------------------------------------------------------------
@@ -123,7 +124,9 @@ struct  sockaddr_in serveur; /* SAP du serveur */
 
 			// ON RÉPOND AU CLIENT
 			//sprintf(buf_write); --> pas besoin de mise en forme
-			ret=write(sock_pipe,buf_write,sizeof(buf_write));
+
+			//on balance directement en binaire la valeur entière de res = TOUCHEE RATEE COULEE
+			ret=write(sock_pipe,&res,sizeof(res));
 
 			//si le retour s'est mal passé, on traite l'erreur
 			if (ret<=0) {

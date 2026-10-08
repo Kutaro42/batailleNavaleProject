@@ -29,13 +29,17 @@ typedef struct{
 } __attribute__((packed)) position_;
 
 
-
 //   Résultat renvoyé par le serveur au client
 enum RESULT_SHOOT{
-    TOUCHEE,
     RATEE,
+    TOUCHEE,
     COULEE
 };
+
+typedef struct{
+    enum RESULT_SHOOT resultat;
+    int coup_restant ;
+} __attribute__((packed)) ReponseServeur;
 
 enum TYPE_BOAT{
     FREGATE=3,
@@ -51,6 +55,7 @@ typedef struct Case {
     enum STATE_CASE etat;
     position_ position;
 }Case;
+
 
 //------------------------------------------------------
 /*

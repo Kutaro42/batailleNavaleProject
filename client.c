@@ -62,6 +62,8 @@ int ret,len;
 	while(!connection_closed) {
 		char    buf_read[1<<8], buf_write[6];// 5 caractères en réalité, car le 6ème est remplacé par un zéro (ligne 62) pour gérer la fin de chaine
 
+		ReponseServeur * reponse;
+
 		// PRISE D'ENTREE CLAVIER POUR LE JOUEUR
 		//on prend le flux clavier et on en écrit le contenu dans le buffer
 		//forme de l'input : [x;y]
@@ -115,15 +117,29 @@ int ret,len;
 
 		printf(" client %2s: (%s:%4d) recoit de ",id, 
 				inet_ntoa(moi.sin_addr),ntohs(moi.sin_port));
-		ret=read(sock,buf_read,sizeof(buf_read));	//on lit dans le descripteur standard du socket serveur (serveur)
+
+				//ici on doit s'attendre à recevoir le message retour du serveur sous forme de structure reponse.
+		ret=read(sock,&reponse,sizeof(ReponseServeur));	//on lit la structure binaire <reponse> dans le descripteur standard du socket serveur (serveur)
+
+		//vérifiation
 		if (ret<=0) {
 			printf("\n%s:  erreur dans read (num=%d, mess=%s)\n",// on traite l'erreur en cas d'échec
 				argv[0],ret,strerror(errno));
 			continue;
 		}
+
+
+		//formatter le buffer pour afficher une chaine propre :
+		interpreter_la_reponse_serveur(buf_read, reponse);
+
+		//afficher le résultat :
 		printf("(%s:%4d) : %s\n",inet_ntoa(serveur.sin_addr),
 			ntohs(serveur.sin_port),buf_read);
+
+
 	}
+
+
 	close(sock);
 	printf(" j ai fini, bye\n");
 	return 0;

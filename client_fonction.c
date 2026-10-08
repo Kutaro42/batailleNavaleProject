@@ -79,4 +79,26 @@ _Bool traitement_entree_clavier(char *buf_write,position_ *pos){
 
 }
 
-
+//prend la réponse serveur et l'adresse d'un buffer en paramètre et le formatte en fonction des données de jeu
+_Bool interpreter_la_reponse_serveur(char * buff, ReponseServeur * reponse){
+    //préparer le stockage des valeurs
+    int size =256;
+    //interpréter le résultat du tir
+    
+    switch (reponse->resultat)
+    {
+    case 0: //raté
+  
+        snprintf(buff,size,"RATÉ, Coup Restant : %d",reponse->coup_restant); //ici pas besoin de forcer le zéro de fin de chaine (contrairement à sprintf classique)
+        break;
+    case 1: //touché
+        snprintf(buff,size,"TOUCHÉ, Coup Restant : %d",reponse->coup_restant);
+        break;
+    
+    default: //coulé
+        snprintf(buff,size,"COULÉ, Coup Restant : %d",reponse->coup_restant);
+        break;
+    }
+    
+    return 1;
+}
