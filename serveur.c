@@ -99,7 +99,7 @@ struct  sockaddr_in serveur; /* SAP du serveur */
 		position_ tir_client; //stocker la position reçu du client
 
 		//JEU
-		while (!la_partie_est_elle_finie(&nbr_coup_restant_, &fin_de_partie_, &liste_des_bateaux)) {
+		while (!la_partie_est_elle_finie(&nbr_coup_restant_, &fin_de_partie_)) {
 			//char    buf_read[5], buf_write[25]="[STATUT ; COUPS RESTANT]\0";// pour nos premiers test 24 caractère sont suffisant, mais on se garde la possibilité d'en rajouter 1 pour le \0
 
 

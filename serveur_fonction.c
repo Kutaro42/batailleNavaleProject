@@ -108,10 +108,8 @@ _Bool reste_t_il_un_bateau(bateau_en_jeu_ *bateau_en_jeu,_Bool *reste_il_un_bate
 }
 
 // 
-_Bool la_partie_est_elle_finie(int * nbr_coup_restant, _Bool*fin_de_partie_, bateau_en_jeu_ *liste_des_bateaux){
-    _Bool encore_des_bateaux = 1;
-    reste_t_il_un_bateau(liste_des_bateaux, &encore_des_bateaux);
-    if(*nbr_coup_restant <= 0 || !encore_des_bateaux){
+_Bool la_partie_est_elle_finie(int * nbr_coup_restant, _Bool*fin_de_partie_){
+    if(*nbr_coup_restant <= 0 || !reste_il_un_bateau_){
         *fin_de_partie_ =1;
     }
     else {
