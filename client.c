@@ -60,16 +60,21 @@ int ret,len;
 
     //Tant que la connection n'est pas interrompue (par un code de sortie du serveur), répéter :
 	while(!connection_closed) {
-		char    buf_read[1<<8], buf_write[6];// 5 caractères en réalité, car le 6ème est remplacé par un zéro (ligne 62) pour gérer la fin de chaine
+		char    buf_read[1<<8], buf_write[1<<6];// 5 caractères en réalité, car le 6ème est remplacé par un zéro (ligne 62) pour gérer la fin de chaine
+
+		ReponseServeur reponse;
 
 		// PRISE D'ENTREE CLAVIER POUR LE JOUEUR
 		//on prend le flux clavier et on en écrit le contenu dans le buffer
 		//forme de l'input : [x;y]
 		
-		prendre_les_entree_clavier(buf_write);
+		position_ position_visee;
+		if(prendre_les_entree_clavier(buf_write,&position_visee)){
+			continue;
+		}
 
 		//	REMARQUE IMPORTANTE : -----------------------------------------------------------------------------------------------------------------------------------------------------------
-		//	- Dans l'état actuel, la lecture de l'entrée utilisateur se heurte à un problème majeur : 
+		//	- Dans un état antérieur, la lecture de l'entrée utilisateur se heurtait à un problème majeur : 
 		//	Au delà de 5 caractères écrit dans le flux standard, le surplus reste en mémoire-tampon et le système l'envoie automatiquement pour remplir les itération suivante du buffer.
 		//	Ce comportement implique un découpage forcé qui oblige le client à envoyer ces caractères inutiles dans des requêtes à la chaine, ce qui pollue le flux et paralyse le serveur.
 		//	Pour le moment nous nous concentrerons sur le fonctionnement pur de la connection, mais la robustesse du code impliquerait une boucle de vidage qui lit les caractère poubelle et
@@ -88,26 +93,53 @@ int ret,len;
 		printf("(%s:%4d) : %s\n",                           //debug
 			inet_ntoa(serveur.sin_addr),ntohs(serveur.sin_port),
 			buf_write);
+
+		// Au lieu de : ret = write(sock, buf_write, strlen(buf_write));
+		// On envoie directement les 8 octets de la structure position_ :
+
+		ret = write(sock, &position_visee, sizeof(position_)); 
+
+		if (ret < sizeof(position_)) {
+			printf("\n%s: erreur dans write binaire (num=%d, mess=%s)\n",
+				argv[0], ret, strerror(errno));
+			continue;
+		}
+/*
 		ret=write(sock,buf_write,strlen(buf_write)); //on écrit dans le descripteur standard du socket client (moi)
 		if (ret<strlen(buf_write)) {
 			printf("\n%s: erreur dans write (num=%d, mess=%s)\n",
 				argv[0],ret,strerror(errno));
 			continue;
 		}
+*/
 
         // PARTIE GESTION SERVEUR
 
 		printf(" client %2s: (%s:%4d) recoit de ",id, 
 				inet_ntoa(moi.sin_addr),ntohs(moi.sin_port));
-		ret=read(sock,buf_read,sizeof(buf_read));	//on lit dans le descripteur standard du socket serveur (serveur)
+
+				//ici on doit s'attendre à recevoir le message retour du serveur sous forme de structure reponse.
+		ret=read(sock,&reponse,sizeof(ReponseServeur));	//on lit la structure binaire <reponse> dans le descripteur standard du socket serveur (serveur)
+
+		//vérifiation
 		if (ret<=0) {
 			printf("\n%s:  erreur dans read (num=%d, mess=%s)\n",// on traite l'erreur en cas d'échec
 				argv[0],ret,strerror(errno));
 			continue;
 		}
+
+
+		//formatter le buffer pour afficher une chaine propre :
+		interpreter_la_reponse_serveur(buf_read, &reponse);
+
+		//afficher le résultat :
 		printf("(%s:%4d) : %s\n",inet_ntoa(serveur.sin_addr),
 			ntohs(serveur.sin_port),buf_read);
+
+
 	}
+
+
 	close(sock);
 	printf(" j ai fini, bye\n");
 	return 0;

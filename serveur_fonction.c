@@ -30,7 +30,7 @@ int dec_nb_coup_restant(int * nbr_coup_restant){
 _Bool le_bateau_est_il_coulee(Bateau * le_bateau){
     //code :
     
-    for(int i=0;0<le_bateau->type;++i){// astuce de conception : j'ai eu l'idée de placer directement la taille active du bateau dans l'enum de sont type, rendant la taille implicite au type de bateau.
+    for(int i=0;i<le_bateau->type;++i){// astuce de conception : j'ai eu l'idée de placer directement la taille active du bateau dans l'enum de sont type, rendant la taille implicite au type de bateau.
         if(le_bateau->cases_occupee[i]->etat==ACTIVE){ //cette fonction sera appelée très souvent, on cherche donc à éliminer le cas le plus probable en premier
             //code
             return 0;
@@ -52,10 +52,10 @@ int resultat_du_tir(position_ *pos, bateau_en_jeu_ *liste_des_bateau){
     Bateau * cible=trouver_le_bateau_correspondant(pos,liste_des_bateau);
 
     //vérifier si la position correspond à un bateau
-    if(cible == nullptr){          //si aucun bateau n'a cette case (cas le plus probable)
+    if(cible == NULL){          //si aucun bateau n'a cette case (cas le plus probable)
         result=RATEE;
     }
-    if(cible != nullptr){          //si une case de bateau est présente
+    if(cible != NULL){          //si une case de bateau est présente
         result=TOUCHEE;
         if (le_bateau_est_il_coulee(cible))
         {
@@ -69,12 +69,12 @@ int resultat_du_tir(position_ *pos, bateau_en_jeu_ *liste_des_bateau){
 //Identifie le bateau correspondant à la case spécifiée en paramètre, renvoie un pointeur vers la cible si trouvé, nullptr sinon.
 Bateau * trouver_le_bateau_correspondant(position_ * pos, bateau_en_jeu_ * liste_bateau){
     //stocker l'adresse du bateau trouvé ici
-    Bateau * bateau_cible;
+    Bateau * bateau_cible=NULL;
 
     //code
     for(int i=0;i<NBRE_FREGATES+NBRE_PORTE_AVIONS;++i){
         for(int j=0;j<5;++j){
-            if(liste_bateau->Bateau_en_jeu[i]->cases_occupee[j]->position.x == pos->x,
+            if(liste_bateau->Bateau_en_jeu[i]->cases_occupee[j]->position.x == pos->x &&
                liste_bateau->Bateau_en_jeu[i]->cases_occupee[j]->position.y == pos->y
             ){
                 bateau_cible=liste_bateau->Bateau_en_jeu[i];
@@ -108,8 +108,10 @@ _Bool reste_t_il_un_bateau(bateau_en_jeu_ *bateau_en_jeu,_Bool *reste_il_un_bate
 }
 
 // 
-_Bool la_partie_est_elle_finie(int * nbr_coup_restant, _Bool*fin_de_partie_){
-    if(nbr_coup_restant <= 0 && !reste_t_il_un_bateau ){
+_Bool la_partie_est_elle_finie(int * nbr_coup_restant, _Bool*fin_de_partie_, bateau_en_jeu_ *liste_des_bateaux){
+    _Bool encore_des_bateaux = 1;
+    reste_t_il_un_bateau(liste_des_bateaux, &encore_des_bateaux);
+    if(*nbr_coup_restant <= 0 || !encore_des_bateaux){
         *fin_de_partie_ =1;
     }
     else {
@@ -120,19 +122,121 @@ _Bool la_partie_est_elle_finie(int * nbr_coup_restant, _Bool*fin_de_partie_){
 }
 
 
+//Alloue l'espace mémoire nécéssaire à la création d'une liste de bateau en jeu : les instancies, renvoie 0 si tout s'est bien passé, 1 en cas d'erreur
+_Bool generation_des_navires(bateau_en_jeu_ *liste_de_bateau){
+if (liste_de_bateau == NULL) return 1;
 
+    int index = 0;
 
-//Génère les navires et les instancies dans la liste des navire en jeu, renvoie 0 si tout s'est bien passé, 1 en cas d'erreur
-int generation_des_navires(bateau_en_jeu_ *liste_de_bateau){
-    //Bateau *porte_avion=malloc(30);
+    // Instanciation des portes-avions (taille 5)
+    for (int i = 0; i < NBRE_PORTE_AVIONS; i++) {
+        Bateau *b = (Bateau *)malloc(sizeof(Bateau));
+        if (b == NULL) return 1;
 
-    return 0; //DEBUG : sert temporairement juste à permettre la compilation pour se concentrer sur les vrai bugs
+        b->type = PORTE_AVION; 
 
+        for (int j = 0; j < 5; j++) {
+            b->cases_occupee[j] = (Case *)malloc(sizeof(Case));
+            if (b->cases_occupee[j] == NULL) return 1;
+            b->cases_occupee[j]->etat = ACTIVE;
+        }
+        liste_de_bateau->Bateau_en_jeu[index++] = b;
+    }
+
+    // Instanciation des frégates (taille 3 active + 2 cases inactives)
+    for (int i = 0; i < NBRE_FREGATES; i++) {
+        Bateau *b = (Bateau *)malloc(sizeof(Bateau));
+        if (b == NULL) return 1;
+
+        b->type = FREGATE; // Type = 3
+
+        for (int j = 0; j < 5; j++) {
+            b->cases_occupee[j] = (Case *)malloc(sizeof(Case));
+            if (b->cases_occupee[j] == NULL) return 1;
+
+            if (j < 3) {
+                b->cases_occupee[j]->etat = ACTIVE;
+            } else {
+                b->cases_occupee[j]->etat = NON_ACTIVE;
+            }
+        }
+        liste_de_bateau->Bateau_en_jeu[index++] = b;
+    }
+
+    return 0;
 }
 
-//Places les navires sur la grille de jeu, renvoie 0 si tout s'est bien passé, 1 en cas d'erreur
-int initialisation_de_la_partie(_Bool * grille_de_jeu_[50][50]){
-    //code
+//Attribue aux navires des coordonées sur la grille de jeu fictive, renvoie 0 si tout s'est bien passé, 1 en cas d'erreur
+_Bool initialisation_de_la_partie(bateau_en_jeu_ *liste_de_bateau){
+if (liste_de_bateau == NULL) return 1;
 
-    return 0;//DEBUG : sert temporairement juste à permettre la compilation pour se concentrer sur les vrai bugs
+
+    // Initialisation du générateur de nombres aléatoires
+    static int rand_init = 0;
+    if (!rand_init) {
+        srand(time(NULL));
+        rand_init = 1;
+    }
+
+    for (int i = 0; i < NBRE_PORTE_AVIONS + NBRE_FREGATES; i++) {
+        Bateau *b = liste_de_bateau->Bateau_en_jeu[i];
+        if (b == NULL) return 1;
+        int taille = 0;
+        if(b->type == PORTE_AVION){
+            taille = 5;
+        }
+        else{
+            taille = 3;
+        }
+
+        int orientation = rand() % 2;                  // 0 = Horizontal, 1 = Vertical
+        int x, y;
+
+        // Génèration des coordonnées
+        if (orientation == 0) {
+            x = rand() % (50 - taille);
+            y = rand() % 50;
+        } else {
+            x = rand() % 50;
+            y = rand() % (50 - taille);
+        }
+
+        for (int j = 0; j < 5; j++) {
+            if (j < taille) {
+                int pos_x ;
+                int pos_y ;
+
+                if (orientation == 0) {
+                    pos_x = x + j;
+                    pos_y = y;
+                } 
+                else { 
+                    pos_x = x;
+                    pos_y = y + j;
+                }
+
+                b->cases_occupee[j]->position.x = pos_x;
+                b->cases_occupee[j]->position.y = pos_y;
+                b->cases_occupee[j]->etat = ACTIVE;
+
+            } else {
+                b->cases_occupee[j]->position.x = -1;
+                b->cases_occupee[j]->position.y = -1;
+                b->cases_occupee[j]->etat = NON_ACTIVE;
+            }
+        }
+    }
+
+    return 0; // Succès
+}
+
+_Bool liberation_memoire(bateau_en_jeu_ *ma_liste){
+    for (int i = 0; i < (NBRE_FREGATES + NBRE_PORTE_AVIONS); i++) {
+        if (ma_liste->Bateau_en_jeu[i] != NULL) {
+            for (int j = 0; j < 5; j++) {
+                free(ma_liste->Bateau_en_jeu[i]->cases_occupee[j]);
+            }
+            free(ma_liste->Bateau_en_jeu[i]);
+        }
+    }
 }

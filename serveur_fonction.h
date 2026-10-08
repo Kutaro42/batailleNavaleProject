@@ -7,6 +7,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <time.h>
 
 
 #define TOTAL_COUPS 50
@@ -14,25 +15,24 @@
 #define NBRE_PORTE_AVIONS 1
 #define NBRE_FREGATES 1
 
-//DECLARATION DES VARIABLES GLOBALES
-extern int nbr_coup_restant_ ;
-extern char * buff_coup_restant_[TAILLE_BUFF];
-extern _Bool fin_de_partie_ ;
-extern _Bool reste_il_un_bateau_;
-extern _Bool * grille_de_jeu_[50][50];//inutile dans ma logique de jeu
-//extern struct bateau_en_jeu_ bateau_en_jeu;
 
-typedef struct position_ {
+typedef struct{
     int x;
     int y;
-}position_;
+} __attribute__((packed)) position_;
+
 
 //   Résultat renvoyé par le serveur au client
 enum RESULT_SHOOT{
-    TOUCHEE,
     RATEE,
+    TOUCHEE,
     COULEE
 };
+
+typedef struct{
+    enum RESULT_SHOOT resultat;
+    int coup_restant ;
+} __attribute__((packed)) ReponseServeur;
 
 enum TYPE_BOAT{
     FREGATE=3,
@@ -46,8 +46,9 @@ enum STATE_CASE{
 
 typedef struct Case {
     enum STATE_CASE etat;
-    struct position_ position;
+    position_ position;
 }Case;
+
 
 //------------------------------------------------------
 /*
@@ -88,7 +89,7 @@ struct bateau {
 //METHODES & FONCTIONS
 int afficher_ecran_titre();
 
-_Bool la_partie_est_elle_finie(int * nbr_coup_restant, _Bool*fin_de_partie_);
+_Bool la_partie_est_elle_finie(int * nbr_coup_restant, _Bool*fin_de_partie_, bateau_en_jeu_ *liste_des_bateaux);
 
 _Bool reste_t_il_un_bateau(bateau_en_jeu_ *bateau_en_jeu,_Bool *reste_il_un_bateau_);
 
@@ -101,3 +102,10 @@ Bateau * trouver_le_bateau_correspondant(position_ * pos, bateau_en_jeu_ * liste
 int resultat_du_tir(position_ *pos, bateau_en_jeu_ *liste_des_bateau);
 
 _Bool le_bateau_est_il_coulee(Bateau * le_bateau);
+
+//
+_Bool generation_des_navires(bateau_en_jeu_ *liste_de_bateau);
+
+_Bool liberation_memoire(bateau_en_jeu_ *ma_liste);
+
+_Bool initialisation_de_la_partie(bateau_en_jeu_ *liste_de_bateau);
