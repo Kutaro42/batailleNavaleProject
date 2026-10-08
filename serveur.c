@@ -16,7 +16,6 @@
 
 #include "serveur_fonction.h"
 
-#define NBECHANGE 3
 
 char* id=0;
 short port=0;
@@ -70,13 +69,14 @@ struct  sockaddr_in serveur; /* SAP du serveur */
 
 		//char * buff_coup_restant_[TAILLE_BUFF];
 		_Bool fin_de_partie_ =0;
+		_Bool victoire_=0;
 		_Bool reste_il_un_bateau_=0;
 
 		
 
 		//CHARGEMENT ET INITIALISATION DES PARAMETRES DE JEU
    
-		int nbr_coup_restant_ =50;//nb_coup_restant sert au dénombrement des essais restants
+		int nbr_coup_restant_ = TOTAL_COUPS;//nb_coup_restant sert au dénombrement des essais restants
 
 		//liste des bateaux en jeu
 		bateau_en_jeu_ liste_des_bateaux;
@@ -99,7 +99,7 @@ struct  sockaddr_in serveur; /* SAP du serveur */
 		position_ tir_client; //stocker la position reçu du client
 
 		//JEU
-		while (!la_partie_est_elle_finie(&nbr_coup_restant_, &fin_de_partie_)) {
+		while (!la_partie_est_elle_finie(&nbr_coup_restant_, &fin_de_partie_, &liste_des_bateaux, &victoire_)) {
 			//char    buf_read[5], buf_write[25]="[STATUT ; COUPS RESTANT]\0";// pour nos premiers test 24 caractère sont suffisant, mais on se garde la possibilité d'en rajouter 1 pour le \0
 
 

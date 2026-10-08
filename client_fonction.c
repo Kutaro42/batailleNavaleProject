@@ -1,7 +1,13 @@
 #include "client_fonction.h"
 
-int afficher_ecran_titre(){
-    return write(1,"\n============================================\n|        BATAILLE NAVALE EN LIGNE !!!       |\n============================================\nEntrer les coordonées de votre premier tir (format XX;YY)\n",197);
+void afficher_ecran_titre(){
+    printf("\n============================================\n|        BATAILLE NAVALE EN LIGNE !!!       |\n============================================\nEntrer les coordonées de votre premier tir (format XX;YY)\n");
+}
+
+void afficher_ecran_fin(){
+    printf("\n============================================\n");
+    printf("|  PARTIE TERMINÉE ! Plus de coups restants. |\n");
+    printf("============================================\n");
 }
 
 _Bool prendre_les_entree_clavier(char *buf_write,position_ *tir_joueur){
@@ -38,7 +44,7 @@ _Bool entree_valide(char *buf_write,position_ *pos){
     if (sscanf(buf_write, "%d;%d", &x_saisi, &y_saisi) == 2) {
         
         // Validation algorithmique locale (on vérifie que le tir est dans les limites de la grille)
-        if (x_saisi >= 0 && x_saisi < 50 && y_saisi >= 0 && y_saisi < 50) {
+        if (x_saisi >= 0 && x_saisi < TAILLE_GRILLE && y_saisi >= 0 && y_saisi < TAILLE_GRILLE) {
             
             // Remplissage de la structure à partir des valeurs validées
             pos->x = x_saisi;

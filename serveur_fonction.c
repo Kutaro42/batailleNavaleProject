@@ -1,13 +1,6 @@
 #include "serveur_fonction.h"
 
 
-
-//definitition des variables globales :
-int nbr_coup_restant_ = TOTAL_COUPS;
-_Bool fin_de_partie_ = 0;
-_Bool reste_il_un_bateau_ = 1;
-
-
 //formatte un buffer spécifié en argument; renvoie 0 = faux en cas d'erreur, 1=vrai si tout se passe bien
 _Bool print_nb_coup_restant(char * buff, int nb_coup){
     if(snprintf(buff, TAILLE_BUFF, "Il vous reste %d coups à jouer", nb_coup)){ //correction : taille définie directement par la taille maximum TAILLE_BUFF car sizeof() renvoie une taille de 8bit (comprenhensible car *buf est une adresse sur 8 bit)
@@ -108,16 +101,26 @@ _Bool reste_t_il_un_bateau(bateau_en_jeu_ *bateau_en_jeu,_Bool *reste_il_un_bate
 }
 
 // 
-_Bool la_partie_est_elle_finie(int * nbr_coup_restant, _Bool*fin_de_partie_){
-    if(*nbr_coup_restant <= 0 || !reste_il_un_bateau_){
-        *fin_de_partie_ =1;
+_Bool la_partie_est_elle_finie(int * nbr_coup_restant, _Bool * fin_de_partie_, bateau_en_jeu_ * liste_des_bateaux,_Bool * victoire) {
+    
+    // On récupère directement le résultat via la valeur de retour de la fonction
+    _Bool encore_des_bateaux = reste_t_il_un_bateau(liste_des_bateaux, &encore_des_bateaux);
+    
+    // Vérification des conditions de fin de partie
+    if (*nbr_coup_restant <= 0 && encore_des_bateaux) { //cas 1 : il ne reste plus de coups à jouer et il reste des bateaux
+        *fin_de_partie_ = 1; //la fin de la partie
+        *victoire = 0; //le client a perdu
+    }
+    if (*nbr_coup_restant >0 && !encore_des_bateaux){ //cas 2 : il reste encore des coups à jouer, mais le client à détruit tout les navires
+        *victoire = 1;// le client à gagné
     }
     else {
-        *fin_de_partie_=0;
+        *fin_de_partie_ = 0;// cas 3 : la prtie n'est pas finie !
     }
+    
     return *fin_de_partie_;
-
 }
+
 
 
 //Alloue l'espace mémoire nécéssaire à la création d'une liste de bateau en jeu : les instancies, renvoie 0 si tout s'est bien passé, 1 en cas d'erreur
@@ -192,11 +195,11 @@ if (liste_de_bateau == NULL) return 1;
 
         // Génèration des coordonnées
         if (orientation == 0) {
-            x = rand() % (50 - taille);
-            y = rand() % 50;
+            x = rand() % (TAILLE_GRILLE - taille);
+            y = rand() % TAILLE_GRILLE;
         } else {
-            x = rand() % 50;
-            y = rand() % (50 - taille);
+            x = rand() % TAILLE_GRILLE;
+            y = rand() % (TAILLE_GRILLE - taille);
         }
 
         for (int j = 0; j < 5; j++) {
