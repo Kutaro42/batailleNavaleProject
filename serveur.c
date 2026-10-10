@@ -98,13 +98,15 @@ struct  sockaddr_in serveur; /* SAP du serveur */
 
 		position_ tir_client; //stocker la position reçu du client
 
+		//créer la structure d'envoi
+		ReponseServeur response;
+
 		//JEU
 		while (!la_partie_est_elle_finie(&nbr_coup_restant_, &fin_de_partie_, &liste_des_bateaux, &victoire_)) {
 			//char    buf_read[5], buf_write[25]="[STATUT ; COUPS RESTANT]\0";// pour nos premiers test 24 caractère sont suffisant, mais on se garde la possibilité d'en rajouter 1 pour le \0
 
 
 			//buf_read[ret] = '\0'; //POUR GERER LA DECOUPE DU MESSAGE
-
 
 			// ON LIT LE MSG DU CLIENT
 			ret=read(sock_pipe,&tir_client,sizeof(position_));
@@ -120,8 +122,7 @@ struct  sockaddr_in serveur; /* SAP du serveur */
 			//affichage DEBUG
 			printf("[Serveur] Tir reçu du joueur ! Coordonnées : X = %d, Y = %d\n", tir_client.x, tir_client.y);
 
-			//créer la structure d'envoi
-			ReponseServeur response;
+			
 
 			//vérifier si une case de bateau existe à la position correspondante, si active (renvoi "touché")
 			response.resultat =resultat_du_tir(&tir_client, &liste_des_bateaux);
@@ -131,8 +132,14 @@ struct  sockaddr_in serveur; /* SAP du serveur */
 			response.coup_restant = dec_nb_coup_restant(&nbr_coup_restant_);
 
 
+			//A CE STADE, ON vERIFIE QUE LE CLIENT n'A PAS DETRUIT LE DERNIER BATEAU
+			if(la_partie_est_elle_finie(&nbr_coup_restant_, &fin_de_partie_, &liste_des_bateaux, &victoire_)){
+				if (fin_de_partie_ && victoire_){
+					envoyer_code_victoire(&response);
+				}
+			}
 			//--------------------------------------------------------------------------
-			
+			// Note : cette logique à ses limites : on réécrit sur la structure les informations de victoire : le client ne peut que supposer qu'il à couler le dernier bateau, car il recevra directement le code de victoire au lieu de son résultat de tir
 
 			// ON RÉPOND AU CLIENT
 			//sprintf(buf_write); --> pas besoin de mise en forme
@@ -147,7 +154,12 @@ struct  sockaddr_in serveur; /* SAP du serveur */
 				break;
 			}
 			sleep(2);
+		
+
 		}
+
+		
+
 		close(sock_pipe);
 		//nettoyer la liste des bateaux allouée
 		liberation_memoire(&liste_des_bateaux);

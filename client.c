@@ -24,6 +24,7 @@ struct  sockaddr_in moi; /* SAP du client ---> service accès point */
 struct  sockaddr_in serveur; /* SAP du serveur */
 int nb_question=0;
 int ret,len;
+_Bool victoire=0;
 
 	if (argc!=4) {
 		fprintf(stderr,"usage: %s id serveur port\n",argv[0]); //si il n'ya pas 4 arg, rediriger vers la sortie d'erreur le msg et quitter avec un code 1
@@ -106,6 +107,7 @@ int ret,len;
 				//ici on doit s'attendre à recevoir le message retour du serveur sous forme de structure reponse.
 		ret=read(sock,&reponse,sizeof(ReponseServeur));	//on lit la structure binaire <reponse> dans le descripteur standard du socket serveur (serveur)
 
+
 		//vérifiation
 		if (ret<=0) {
 			printf("\n%s:  erreur dans read (num=%d, mess=%s)\n",// on traite l'erreur en cas d'échec = connection avec l'hôte certainement perdue !
@@ -115,20 +117,25 @@ int ret,len;
 
 
 		//formatter le buffer pour afficher une chaine propre :
-		interpreter_la_reponse_serveur(buf_read, &reponse);
+		interpreter_la_reponse_serveur(buf_read, &reponse,&victoire);
 
+		
 		//afficher le résultat :
 		printf("(%s:%4d) : %s\n",inet_ntoa(serveur.sin_addr),
 			ntohs(serveur.sin_port),buf_read);
 
 		// Dans le cas ou le nbre de coups renvoyé atteind 0 :
-		if (reponse.coup_restant <= 0) {
-			afficher_ecran_fin();
+		if (victoire || reponse.coup_restant <= 0) {
 
 			break; // On quitte la boucle de jeu
 
 		}
+		
 	}
+	// si le serveur à envoyé le code spécial, on déclenche la victoire :
+	
+	afficher_ecran_fin(&victoire);
+	
 
 
 	close(sock);//on ferme le socket de communication

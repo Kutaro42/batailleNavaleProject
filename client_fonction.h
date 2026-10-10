@@ -33,7 +33,7 @@ typedef struct{
 // METHODES ET FONCTIONS
 
 extern void afficher_ecran_titre();
-extern void afficher_ecran_fin();
+extern void afficher_ecran_fin(_Bool * victoire_);
 extern _Bool prendre_les_entree_clavier(char *buf_write, position_* tir_joueur);
 extern _Bool traitement_entree_clavier(char *buff,position_* tir_joueur);
-extern _Bool interpreter_la_reponse_serveur(char * buff, ReponseServeur * reponse);
+extern _Bool interpreter_la_reponse_serveur(char * buff, ReponseServeur * reponse,_Bool *victoire);
