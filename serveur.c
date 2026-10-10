@@ -13,6 +13,9 @@
 #include <sys/socket.h>  // Pour socket, bind, listen, accept, AF_INET, SOCK_STREAM
 #include <netinet/in.h>  // Pour sockaddr_in, htons, ntohs, INADDR_ANY
 #include <arpa/inet.h>   // Pour inet_ntoa
+//pour la gestion multijoueur en simultané
+#include <sys/wait.h> // Pour waitpid
+#include <signal.h>    // Pour sigaction et SIGCHLD
 
 #include "serveur_fonction.h"
 
