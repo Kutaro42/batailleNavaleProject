@@ -12,8 +12,6 @@
 #include "client_fonction.h"
 
 
-#define NBECHANGE 3
-
 char* id=0;
 short sport=0;
 _Bool connection_closed = 0; //renseigne l'état de la connection (=indicateur de l'état de connection en tps réel)
@@ -26,6 +24,7 @@ struct  sockaddr_in moi; /* SAP du client ---> service accès point */
 struct  sockaddr_in serveur; /* SAP du serveur */
 int nb_question=0;
 int ret,len;
+_Bool victoire=0;
 
 	if (argc!=4) {
 		fprintf(stderr,"usage: %s id serveur port\n",argv[0]); //si il n'ya pas 4 arg, rediriger vers la sortie d'erreur le msg et quitter avec un code 1
@@ -53,10 +52,7 @@ int ret,len;
 
 
 	//AFFICHER L'ÉCRAN TITRE DU JEU :
-	int titre =afficher_ecran_titre();
-	
-
-
+	afficher_ecran_titre();
 
     //Tant que la connection n'est pas interrompue (par un code de sortie du serveur), répéter :
 	while(!connection_closed) {
@@ -82,9 +78,6 @@ int ret,len;
 		// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-		
-		//int writting =write(,input_buff,sizeof(inputing));//on fait la taille de inputing pour lire le nbre de caractères réellement lus.
-
         // PARTIE GESTION CLIENT |==> on vise à long terme une gestion sécurisé des entrées clavier du joueur, pour éviter et empêcher les erreurs de saisie avant qu'elles soient envoyées au serveur.
 
 		//sprintf(buf_write,":%s",id); //coordonées x;y ==> temporairement 'buf_write' pour vérifier, résultat de la couche de sécurité dans un second temps.
@@ -104,14 +97,7 @@ int ret,len;
 				argv[0], ret, strerror(errno));
 			continue;
 		}
-/*
-		ret=write(sock,buf_write,strlen(buf_write)); //on écrit dans le descripteur standard du socket client (moi)
-		if (ret<strlen(buf_write)) {
-			printf("\n%s: erreur dans write (num=%d, mess=%s)\n",
-				argv[0],ret,strerror(errno));
-			continue;
-		}
-*/
+
 
         // PARTIE GESTION SERVEUR
 
@@ -121,26 +107,38 @@ int ret,len;
 				//ici on doit s'attendre à recevoir le message retour du serveur sous forme de structure reponse.
 		ret=read(sock,&reponse,sizeof(ReponseServeur));	//on lit la structure binaire <reponse> dans le descripteur standard du socket serveur (serveur)
 
+
 		//vérifiation
 		if (ret<=0) {
-			printf("\n%s:  erreur dans read (num=%d, mess=%s)\n",// on traite l'erreur en cas d'échec
+			printf("\n%s:  erreur dans read (num=%d, mess=%s)\n",// on traite l'erreur en cas d'échec = connection avec l'hôte certainement perdue !
 				argv[0],ret,strerror(errno));
-			continue;
+			break;
 		}
 
 
 		//formatter le buffer pour afficher une chaine propre :
-		interpreter_la_reponse_serveur(buf_read, &reponse);
+		interpreter_la_reponse_serveur(buf_read, &reponse,&victoire);
 
+		
 		//afficher le résultat :
 		printf("(%s:%4d) : %s\n",inet_ntoa(serveur.sin_addr),
 			ntohs(serveur.sin_port),buf_read);
 
+		// Dans le cas ou le nbre de coups renvoyé atteind 0 :
+		if (victoire || reponse.coup_restant <= 0) {
 
+			break; // On quitte la boucle de jeu
+
+		}
+		
 	}
+	// si le serveur à envoyé le code spécial, on déclenche la victoire :
+	
+	afficher_ecran_fin(&victoire);
+	
 
 
-	close(sock);
-	printf(" j ai fini, bye\n");
+	close(sock);//on ferme le socket de communication
+	printf(" j ai fini, bye\n");//petit msg sympa déjà présent dans le code du prof
 	return 0;
 }

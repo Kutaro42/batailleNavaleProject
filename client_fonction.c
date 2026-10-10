@@ -1,7 +1,20 @@
 #include "client_fonction.h"
 
-int afficher_ecran_titre(){
-    return write(1,"\n============================================\n|        BATAILLE NAVALE EN LIGNE !!!       |\n============================================\nEntrer les coordonées de votre premier tir (format XX;YY)\n",197);
+void afficher_ecran_titre(){
+    printf("\n============================================\n|        BATAILLE NAVALE EN LIGNE !!!       |\n============================================\nEntrer les coordonées de votre premier tir (format XX;YY)\n");
+}
+
+void afficher_ecran_fin(_Bool * victoire_){
+
+    if(!(*victoire_)){
+        printf("\n============================================\n");
+        printf("|  PARTIE TERMINÉE ! Plus de coups restants. |\n");
+        printf("============================================\n");
+    } else {
+        printf("\n============================================\n");
+        printf("|  PARTIE TERMINÉE ! VOUS AVEZ GAGNÉ  !!!    |\n");
+        printf("============================================\n");
+    }
 }
 
 _Bool prendre_les_entree_clavier(char *buf_write,position_ *tir_joueur){
@@ -38,7 +51,7 @@ _Bool entree_valide(char *buf_write,position_ *pos){
     if (sscanf(buf_write, "%d;%d", &x_saisi, &y_saisi) == 2) {
         
         // Validation algorithmique locale (on vérifie que le tir est dans les limites de la grille)
-        if (x_saisi >= 0 && x_saisi < 50 && y_saisi >= 0 && y_saisi < 50) {
+        if (x_saisi >= 0 && x_saisi < TAILLE_GRILLE && y_saisi >= 0 && y_saisi < TAILLE_GRILLE) {
             
             // Remplissage de la structure à partir des valeurs validées
             pos->x = x_saisi;
@@ -80,9 +93,10 @@ _Bool traitement_entree_clavier(char *buf_write,position_ *pos){
 }
 
 //prend la réponse serveur et l'adresse d'un buffer en paramètre et le formatte en fonction des données de jeu
-_Bool interpreter_la_reponse_serveur(char * buff, ReponseServeur * reponse){
+_Bool interpreter_la_reponse_serveur(char * buff, ReponseServeur * reponse,_Bool * victoire){
     //préparer le stockage des valeurs
-    int size =256;
+    int size =256;//on balance une taille conséquente pour éviter l'overloading du buffer, de toute façon snprintf gère ça tout seul sur ce qui sera réellement écrit
+
     //interpréter le résultat du tir
     
     switch (reponse->resultat)
@@ -94,7 +108,11 @@ _Bool interpreter_la_reponse_serveur(char * buff, ReponseServeur * reponse){
     case 1: //touché
         snprintf(buff,size,"TOUCHÉ, Coup Restant : %d",reponse->coup_restant);
         break;
-    
+
+    case 3:// gagné
+        snprintf(buff,size,"VICTOIRE !!! Vous avez gagné ! Il vous restait %d coups à jouer",reponse->coup_restant);// le case 3 est spécial : il n'existe aucun enum possèdant la valeur 3 coté serveur, car il s'agit du code victoire
+        *victoire=1;
+        break;
     default: //coulé
         snprintf(buff,size,"COULÉ, Coup Restant : %d",reponse->coup_restant);
         break;

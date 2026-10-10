@@ -10,7 +10,8 @@
 #include <time.h>
 
 
-#define TOTAL_COUPS 50
+#define TOTAL_COUPS 10
+#define TAILLE_GRILLE 20
 #define TAILLE_BUFF 50
 #define NBRE_PORTE_AVIONS 1
 #define NBRE_FREGATES 1
@@ -89,9 +90,11 @@ struct bateau {
 //METHODES & FONCTIONS
 int afficher_ecran_titre();
 
-_Bool la_partie_est_elle_finie(int * nbr_coup_restant, _Bool*fin_de_partie_, bateau_en_jeu_ *liste_des_bateaux);
+_Bool la_partie_est_elle_finie(int * nbr_coup_restant, _Bool * fin_de_partie_, bateau_en_jeu_ * liste_des_bateaux,_Bool * victoire);
 
-_Bool reste_t_il_un_bateau(bateau_en_jeu_ *bateau_en_jeu,_Bool *reste_il_un_bateau_);
+void envoyer_code_victoire(ReponseServeur *response);
+
+_Bool reste_t_il_un_bateau(bateau_en_jeu_ *bateau_en_jeu);
 
 int dec_nb_coup_restant(int * nbr_coup_restant);
 

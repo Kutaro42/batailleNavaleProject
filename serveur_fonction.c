@@ -1,13 +1,6 @@
 #include "serveur_fonction.h"
 
 
-
-//definitition des variables globales :
-int nbr_coup_restant_ = TOTAL_COUPS;
-_Bool fin_de_partie_ = 0;
-_Bool reste_il_un_bateau_ = 1;
-
-
 //formatte un buffer spécifié en argument; renvoie 0 = faux en cas d'erreur, 1=vrai si tout se passe bien
 _Bool print_nb_coup_restant(char * buff, int nb_coup){
     if(snprintf(buff, TAILLE_BUFF, "Il vous reste %d coups à jouer", nb_coup)){ //correction : taille définie directement par la taille maximum TAILLE_BUFF car sizeof() renvoie une taille de 8bit (comprenhensible car *buf est une adresse sur 8 bit)
@@ -57,6 +50,7 @@ int resultat_du_tir(position_ *pos, bateau_en_jeu_ *liste_des_bateau){
     }
     if(cible != NULL){          //si une case de bateau est présente
         result=TOUCHEE;
+
         if (le_bateau_est_il_coulee(cible))
         {
             result=COULEE;
@@ -75,9 +69,12 @@ Bateau * trouver_le_bateau_correspondant(position_ * pos, bateau_en_jeu_ * liste
     for(int i=0;i<NBRE_FREGATES+NBRE_PORTE_AVIONS;++i){
         for(int j=0;j<5;++j){
             if(liste_bateau->Bateau_en_jeu[i]->cases_occupee[j]->position.x == pos->x &&
-               liste_bateau->Bateau_en_jeu[i]->cases_occupee[j]->position.y == pos->y
+               liste_bateau->Bateau_en_jeu[i]->cases_occupee[j]->position.y == pos->y &&
+               liste_bateau->Bateau_en_jeu[i]->cases_occupee[j]->etat == ACTIVE //parce qu'on voudrait éviter au joueur de frapper la même case en boucle
             ){
-                bateau_cible=liste_bateau->Bateau_en_jeu[i];
+                bateau_cible=liste_bateau->Bateau_en_jeu[i];// renvoyer le bateau trouvé
+                liste_bateau->Bateau_en_jeu[i]->cases_occupee[j]->etat=NON_ACTIVE; //on désactive au passage la case (car on utilise pour le moment cette fonction uniquement pour désactiver des cases, mais cette logique pourrait poser des problème si on décide de rajouter un système d'affichage des cases)
+
             }
         }
     }
@@ -85,16 +82,15 @@ Bateau * trouver_le_bateau_correspondant(position_ * pos, bateau_en_jeu_ * liste
     return bateau_cible;
 }
 
-_Bool reste_t_il_un_bateau(bateau_en_jeu_ *bateau_en_jeu,_Bool *reste_il_un_bateau_){
+_Bool reste_t_il_un_bateau(bateau_en_jeu_ *bateau_en_jeu){
 
     //parcourir la liste des bateaux
 
     for(int i=0;i<NBRE_FREGATES+NBRE_PORTE_AVIONS;++i){
         //code :
         for(int j=0;j<5;++j){// avec la logique des 5 cases partagées, on n'a plus besoin de s'embêter avec les tailles
-            if(bateau_en_jeu->Bateau_en_jeu[i]->cases_occupee[j]->etat == ACTIVE){ //si on trouve ne serait-ce qu'un seul bateau avec une case encore active, la partie continue
-                *reste_il_un_bateau_=1;
-                return *reste_il_un_bateau_; //bateau trouvé = reprise de la partie
+            if(bateau_en_jeu->Bateau_en_jeu[i]->cases_occupee[j]->etat == ACTIVE){ //si on trouve ne serait-ce qu'un seul bateau avec une case encore active, la partie continue               
+                return 1; //bateau trouvé = reprise de la partie
             }
 
         }
@@ -102,25 +98,41 @@ _Bool reste_t_il_un_bateau(bateau_en_jeu_ *bateau_en_jeu,_Bool *reste_il_un_bate
     }
 
     //DANS LE CAS OU IL NE RESTE AUCUN BATEAU
-    *reste_il_un_bateau_=0;// on met à jour la variable
-    return *reste_il_un_bateau_; //on renvoie sa valeur comme code de sortie booléen pour traitement
+
+    return 0; //on renvoie sa valeur comme code de sortie booléen pour traitement
 
 }
 
 // 
-_Bool la_partie_est_elle_finie(int * nbr_coup_restant, _Bool*fin_de_partie_, bateau_en_jeu_ *liste_des_bateaux){
-    _Bool encore_des_bateaux = 1;
-    reste_t_il_un_bateau(liste_des_bateaux, &encore_des_bateaux);
-    if(*nbr_coup_restant <= 0 || !encore_des_bateaux){
+_Bool la_partie_est_elle_finie(int * nbr_coup_restant, _Bool * fin_de_partie_, bateau_en_jeu_ * liste_des_bateaux,_Bool * victoire) {
+    
+    // On récupère directement le résultat via la valeur de retour de la fonction
+    _Bool encore_des_bateaux = reste_t_il_un_bateau(liste_des_bateaux);;
+    
+    // Vérification des conditions de fin de partie
+    if (*nbr_coup_restant <= 0 && encore_des_bateaux) { //cas 1 : il ne reste plus de coups à jouer et il reste des bateaux
+        *fin_de_partie_ = 1; //la fin de la partie
+        *victoire = 0; //le client a perdu
+    }
+    else if (*nbr_coup_restant >0 && !encore_des_bateaux){ //cas 2 : il reste encore des coups à jouer, mais le client à détruit tout les navires
+        *victoire = 1;// le client à gagné
         *fin_de_partie_ =1;
     }
     else {
-        *fin_de_partie_=0;
+        *fin_de_partie_ = 0;// cas 3 : la partie n'est pas finie !
+        *victoire = 0;
     }
+    
     return *fin_de_partie_;
-
 }
 
+//Insérer un chiffre spécial pour glisser le code de victoire dans la trame sans changer la nature de la structure renvoyée de façon élégante
+void envoyer_code_victoire(ReponseServeur *response){
+    response->resultat = 3;// le code spécial de victoire
+
+    // on a pas besoin de toucher à la partie contenant le nbr d'essais restant, car le joueur est obligé de faire quelques actions avant de gagner, ce qui garantit que le nbre d'essais restant stocké sera toujours correct.
+    // Car s'appuyant sur la dernière valeur du tour précédent.
+}
 
 //Alloue l'espace mémoire nécéssaire à la création d'une liste de bateau en jeu : les instancies, renvoie 0 si tout s'est bien passé, 1 en cas d'erreur
 _Bool generation_des_navires(bateau_en_jeu_ *liste_de_bateau){
@@ -194,11 +206,11 @@ if (liste_de_bateau == NULL) return 1;
 
         // Génèration des coordonnées
         if (orientation == 0) {
-            x = rand() % (50 - taille);
-            y = rand() % 50;
+            x = rand() % (TAILLE_GRILLE - taille);
+            y = rand() % TAILLE_GRILLE;
         } else {
-            x = rand() % 50;
-            y = rand() % (50 - taille);
+            x = rand() % TAILLE_GRILLE;
+            y = rand() % (TAILLE_GRILLE - taille);
         }
 
         for (int j = 0; j < 5; j++) {
