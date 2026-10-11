@@ -1,13 +1,21 @@
+
 #include <stdio.h>
 #include <errno.h>
 #include <netinet/in.h>
 #include <string.h>
-#include <stdlib.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <time.h>
+#include <stdio.h>       // Pour printf, fprintf, sprintf
+#include <stdlib.h>      // Pour exit, atoi
+#include <string.h>      // Pour strerror
+#include <errno.h>       // Pour errno
+#include <unistd.h>      // Pour read, write, close, sleep
+#include <sys/types.h>   // Pour les définitions de types système (socklen_t)
+#include <sys/socket.h>  // Pour socket, bind, listen, accept, AF_INET, SOCK_STREAM
+#include <netinet/in.h>  // Pour sockaddr_in, htons, ntohs, INADDR_ANY
+#include <arpa/inet.h>   // Pour inet_ntoa
+//pour la gestion multijoueur en simultané
+#include <sys/wait.h> // Pour waitpid
+#include <signal.h>    // Pour sigaction et SIGCHLD
+#include <time.h> //pour la génération pseudo-aléatoire
 
 
 #define TOTAL_COUPS 10
@@ -15,6 +23,11 @@
 #define TAILLE_BUFF 50
 #define NBRE_PORTE_AVIONS 1
 #define NBRE_FREGATES 1
+
+
+extern int nb_joueurs_actifs;
+
+//--------------------------------------------------------------------------------------------------------
 
 
 typedef struct{
@@ -89,6 +102,8 @@ struct bateau {
 
 //METHODES & FONCTIONS
 int afficher_ecran_titre();
+
+void gestionnaire_signaux_fils(int sig);
 
 _Bool la_partie_est_elle_finie(int * nbr_coup_restant, _Bool * fin_de_partie_, bateau_en_jeu_ * liste_des_bateaux,_Bool * victoire);
 

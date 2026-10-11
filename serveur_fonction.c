@@ -1,5 +1,6 @@
 #include "serveur_fonction.h"
 
+int nb_joueurs_actifs =0;
 
 //formatte un buffer spécifié en argument; renvoie 0 = faux en cas d'erreur, 1=vrai si tout se passe bien
 _Bool print_nb_coup_restant(char * buff, int nb_coup){
@@ -250,5 +251,17 @@ _Bool liberation_memoire(bateau_en_jeu_ *ma_liste){
             }
             free(ma_liste->Bateau_en_jeu[i]);
         }
+    }
+}
+
+
+// Définition du gestionnaire de signal pour nettoyer les processus fils
+void gestionnaire_signaux_fils(int sig) {
+    pid_t pid;
+
+    //tant que le père arrive à récupérer le signal de mort de l'un de ses fils (peut importe les raisons de la mort), màj le compteur de fils en ligne sans arrêter d'écouter les nouveau clients
+    while ((pid = waitpid(-1, NULL, WNOHANG)) > 0) {
+        nb_joueurs_actifs--;
+        if (nb_joueurs_actifs < 0) nb_joueurs_actifs = 0;
     }
 }
