@@ -60,8 +60,6 @@ int main(int argc, char** argv)
    }
 
 
-
-
    //BOUCLE DE CONNECTION (chaque client doit avoir droit à ses 50 coups !)
 	while (1) {
 		struct  sockaddr_in client; /* SAP du client */
@@ -104,7 +102,6 @@ int main(int argc, char** argv)
 
 			//DECLARATION DES VARIABLES GLOBALES DE LA PARTIE
 
-			//char * buff_coup_restant_[TAILLE_BUFF];
 			_Bool fin_de_partie_ =0;
 			_Bool victoire_=0;
 			_Bool reste_il_un_bateau_=0;

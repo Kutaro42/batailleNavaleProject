@@ -1,14 +1,5 @@
 // clientt.c (client TCP)
 
-#include <stdio.h>
-#include <errno.h>
-#include <netinet/in.h>
-#include <string.h>
-#include <stdlib.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-
 #include "client_fonction.h"
 
 
@@ -73,7 +64,7 @@ _Bool victoire=0;
 		//	- Dans un état antérieur, la lecture de l'entrée utilisateur se heurtait à un problème majeur : 
 		//	Au delà de 5 caractères écrit dans le flux standard, le surplus reste en mémoire-tampon et le système l'envoie automatiquement pour remplir les itération suivante du buffer.
 		//	Ce comportement implique un découpage forcé qui oblige le client à envoyer ces caractères inutiles dans des requêtes à la chaine, ce qui pollue le flux et paralyse le serveur.
-		//	Pour le moment nous nous concentrerons sur le fonctionnement pur de la connection, mais la robustesse du code impliquerait une boucle de vidage qui lit les caractère poubelle et
+		//	Je me suis concentré dans un premier temps sur le fonctionnement pur de la connection, mais je savait que la robustesse du code impliquerait une boucle de vidage qui lit les caractères poubelle et
 		//	les place dans un buffer de vidage avant de vider ce buffer. Le principe étant de vider et remplir le buffer poubelle de ces caractères jusqu'a épuisement de ces derniers.
 		// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -135,10 +126,16 @@ _Bool victoire=0;
 	// si le serveur à envoyé le code spécial, on déclenche la victoire :
 	
 	afficher_ecran_fin(&victoire);
+	//REMARQUE IMPORTANTE :
+	// La trame de communication que j'avait proposé au départ ne contenait que le résultat du tir, et le nbre de doups restant,
+	// mais la limite de ce système s'est très vite montré quand il à fallu communiquer la victoire au client.
+	// J'ai donc rfléchit à un moyen de communiquer cette victoire, sans changer ma structure :
+	// la solution élégante que j'ai trouvé consiste à glisser un code spécial arbitraire (ici = 3) à la place du résultat du tir.
+	// De cette façon, il suffisait juste d'ajouter un code gestionnaire de cette exception coté client, et le tour était joué ! 
 	
 
 
 	close(sock);//on ferme le socket de communication
-	printf(" j ai fini, bye\n");//petit msg sympa déjà présent dans le code du prof
+	printf(" j ai fini, bye\n");//petit msg sympa qui était déjà présent dans le code du prof
 	return 0;
 }

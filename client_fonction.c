@@ -18,10 +18,6 @@ void afficher_ecran_fin(_Bool * victoire_){
 }
 
 _Bool prendre_les_entree_clavier(char *buf_write,position_ *tir_joueur){
-    //char input_buff[1<<3]; // on à théoriquement besoin d'entrer seulement 5 caractères mais on peux en rajouter pour + de place pour d'éventuel information supp
-		
-	//int inputing =read(0,buf_write,sizeof(buf_write));//lit l'entree standard et stocke la chaine traitée dans le buffer write_buf 
-	//buf_write[inputing] = '\0'; 
 
     _Bool saisie_correcte = 0; //au départ, on par du principe que c'est incorrecte
     // ALGORITHME DE SAISIE ET DE VALIDATION
@@ -48,7 +44,8 @@ _Bool entree_valide(char *buf_write,position_ *pos){
     //Récuperer le x et le y:
     // Extraction des valeurs numériques et validation du format
     // sscanf renvoie le nombre d'éléments correctement trouvés
-    if (sscanf(buf_write, "%d;%d", &x_saisi, &y_saisi) == 2) {
+    if (sscanf(buf_write, "%d;%d", &x_saisi, &y_saisi) == 2) { //scanf est ultra utile pour parser/extraire des info dans du texte 
+                                                               //int sscanf(const char *str, const char *format, ...);
         
         // Validation algorithmique locale (on vérifie que le tir est dans les limites de la grille)
         if (x_saisi >= 0 && x_saisi < TAILLE_GRILLE && y_saisi >= 0 && y_saisi < TAILLE_GRILLE) {
@@ -80,12 +77,8 @@ _Bool traitement_entree_clavier(char *buf_write,position_ *pos){
 
 
     // Éliminer le '\n' à la fin de la chaîne s'il est présent
-    buf_write[strcspn(buf_write, "\n")] = '\0';
-
-    // Si l'utilisateur a juste appuyé sur Entrée (chaîne vide), on passe
-    /*if (strlen(buf_write) == 0) {
-        return 0;
-    }*/
+    buf_write[strcspn(buf_write, "\n")] = '\0'; //pratique pour retourner la position de la première occurence d'un \n et la remplacer par un 0 binaire
+    //size_t strcspn(const char *s, const char *reject);
 
     //On vérifie que l'entrée est traitable. si oui, on la parque dans une struct position et on l'envoie sous forme binaire au serveur pour un traitement plus efficace
     return entree_valide(buf_write,pos);

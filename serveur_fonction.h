@@ -18,7 +18,7 @@
 #include <time.h> //pour la génération pseudo-aléatoire
 
 
-#define TOTAL_COUPS 10
+#define TOTAL_COUPS 50
 #define TAILLE_GRILLE 20
 #define TAILLE_BUFF 50
 #define NBRE_PORTE_AVIONS 1
@@ -64,21 +64,6 @@ typedef struct Case {
 }Case;
 
 
-//------------------------------------------------------
-/*
-typedef struct porte_avion {
-    struct Case *cases_occupee[5];
-    const int taille=5;
-    //...
-
-}porte_avion;
-typedef struct fregate{
-    struct Case *case_occupee[3];
-    const int taille=3;
-    //<..
-}fregate;*/
-//-------------------------------------------------------
-
 typedef struct Bateau{
     enum TYPE_BOAT type;
     struct Case *cases_occupee[5]; //mettre à 5 case, on en activera que 3 pour les frégate (on met des zéro sur les deux dernières)
@@ -92,13 +77,6 @@ typedef struct bateau_en_jeu_{
 
 }bateau_en_jeu_;
 
-
-/*
-struct bateau {
-    int size;
-    int *cases_occuppee[size];
-}
-*/
 
 //METHODES & FONCTIONS
 int afficher_ecran_titre();
@@ -121,7 +99,6 @@ int resultat_du_tir(position_ *pos, bateau_en_jeu_ *liste_des_bateau);
 
 _Bool le_bateau_est_il_coulee(Bateau * le_bateau);
 
-//
 _Bool generation_des_navires(bateau_en_jeu_ *liste_de_bateau);
 
 _Bool liberation_memoire(bateau_en_jeu_ *ma_liste);
