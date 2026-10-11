@@ -109,3 +109,5 @@ _Bool generation_des_navires(bateau_en_jeu_ *liste_de_bateau);
 _Bool liberation_memoire(bateau_en_jeu_ *ma_liste);
 
 _Bool initialisation_de_la_partie(bateau_en_jeu_ *liste_de_bateau);
+
+void afficher_grille_triche(const bateau_en_jeu_ *liste_des_bateaux);

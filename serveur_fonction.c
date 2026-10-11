@@ -238,3 +238,24 @@ _Bool liberation_memoire(bateau_en_jeu_ *ma_liste){
         }
     }
 }
+
+
+void afficher_grille_triche(const bateau_en_jeu_ *liste_des_bateaux) {
+    printf("\n=== MODE TRICHE : COORDONNÉES DES BATEAUX ===\n");
+    if (liste_des_bateaux == NULL) return;
+
+    for (int i = 0; i < NBRE_PORTE_AVIONS + NBRE_FREGATES; i++) {
+        const Bateau *b = liste_des_bateaux->Bateau_en_jeu[i];
+        if (b != NULL) {
+            printf("Bateau %d (Type: %d) :\n", i, b->type);
+            for (int j = 0; j < 5; j++) {
+                if (b->cases_occupee[j]->etat == ACTIVE || b->cases_occupee[j]->position.x != -1) {
+                    printf("  -> Case %d : X = %d, Y = %d\n", j, 
+                           b->cases_occupee[j]->position.x, 
+                           b->cases_occupee[j]->position.y);
+                }
+            }
+        }
+    }
+    printf("===========================================\n\n");
+}

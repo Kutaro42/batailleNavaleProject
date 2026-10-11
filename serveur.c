@@ -92,7 +92,9 @@ struct  sockaddr_in serveur; /* SAP du serveur */
 
 		if (initialisation_de_la_partie(&liste_des_bateaux) == 0) {
 			printf("Les navires ont été positionnés sur la grille avec succès !\n");//on fait toujours référence à une grille, même si elle est fictive
+			afficher_grille_triche(&liste_des_bateaux);
 		}
+
 
 
 
