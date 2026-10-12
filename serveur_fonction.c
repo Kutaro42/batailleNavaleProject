@@ -260,7 +260,7 @@ void gestionnaire_signaux_fils(int sig) {
     pid_t pid;
 
     //tant que le père arrive à récupérer le signal de mort de l'un de ses fils (peut importe les raisons de la mort), màj le compteur de fils en ligne sans arrêter d'écouter les nouveau clients
-    while ((pid = waitpid(-1, NULL, WNOHANG)) > 0) {
+    while ((pid = waitpid(-1, NULL, WNOHANG)) > 0) { //Wait No Hang = attend sans interrompre le programme (ne bloque pas tout)
         nb_joueurs_actifs--;
         if (nb_joueurs_actifs < 0) nb_joueurs_actifs = 0;
     }
