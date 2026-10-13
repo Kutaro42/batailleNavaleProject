@@ -8,8 +8,18 @@ short port=0;
 int sock=0;	/* socket de communication */
 
 
+
+
 int main(int argc, char** argv)
 {
+
+	// Association du signal SIGINT au gestionnaire du serveur
+    if (signal(SIGINT, signal_sigterm_serveur) == SIG_ERR) {
+        perror("Erreur du signal ");
+        exit(EXIT_FAILURE);
+	}
+
+
     // Configuration de la structure signal
     struct sigaction signal_d_action;
 
@@ -120,6 +130,7 @@ int main(int argc, char** argv)
 
 			if (initialisation_de_la_partie(&liste_des_bateaux) == 0) {
 				printf("Les navires ont été positionnés sur la grille avec succès !\n");//on fait toujours référence à une grille, même si elle est fictive
+				afficher_grille_triche(&liste_des_bateaux);
 			}
 
 
@@ -184,8 +195,7 @@ int main(int argc, char** argv)
 			//nettoyer la liste des bateaux allouée
 			liberation_memoire(&liste_des_bateaux);
 
-			exit(0);//fermer avant que le fils fasse n'importe quoi (remonte dans la main et commence à intercepter les client en se dédoublant)
-		
+			exit(0);//fermer avant que le fils fasse n'importe quoi (remonte dans la main et commence à intercepter les client en se dédoublant)		
 		} else {
 			// le PÈRE
 			// La variable 'pid' contient l'identifiant du fils qui vient de naître
