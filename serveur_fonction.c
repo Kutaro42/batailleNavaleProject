@@ -186,11 +186,7 @@ if (liste_de_bateau == NULL) return 1;
 
 
     // Initialisation du générateur de nombres aléatoires
-    static int rand_init = 0;
-    if (!rand_init) {
-        srand(time(NULL));
-        rand_init = 1;
-    }
+srand(time(NULL));
 
     for (int i = 0; i < NBRE_PORTE_AVIONS + NBRE_FREGATES; i++) {
         bateau_t *b = liste_de_bateau->navires[i];
@@ -267,4 +263,33 @@ void gestionnaire_signaux_fils(int sig) {
         nb_joueurs_actifs--;
         if (nb_joueurs_actifs < 0) nb_joueurs_actifs = 0;
     }
+}
+
+
+void afficher_grille_triche(const bateau_en_jeu_t *liste_des_bateaux_t) {
+        printf("\n=== MODE TRICHE : COORDONNÉES DES BATEAUX ===\n");
+        if (liste_des_bateaux_t == NULL) return;
+
+        for (int i = 0; i < NBRE_PORTE_AVIONS + NBRE_FREGATES; i++) {
+            const bateau_t *b = liste_des_bateaux_t->bateau_en_jeu_t[i];
+            if (b != NULL) {
+                printf("Bateau %d (Type: %d) :\n", i, b->type);
+                for (int j = 0; j < 5; j++) {
+                    if (b->cases_occupee[j]->etat == ACTIVE || b->cases_occupee[j]->position.x != -1) {
+                        printf("  -> Case %d : X = %d, Y = %d\n", j, 
+                        b->cases_occupee[j]->position.x, 
+                        b->cases_occupee[j]->position.y);
+                    }
+                }
+            }
+    }
+printf("===========================================\n\n");
+}
+
+void signal_sigterm_serveur(int num_signal) {
+    printf("\n[Serveur] Signal reçu (Ctrl-C détecté).\n");
+    
+    printf("[Serveur] Envoi du signal de terminaison aux parties en cours.\n");
+    printf("[Serveur] Arrêt du serveur.\n");
+    kill(0, SIGTERM); 
 }

@@ -16,6 +16,7 @@
 #include <sys/wait.h> // Pour waitpid
 #include <signal.h>    // Pour sigaction et SIGCHLD
 #include <time.h> //pour la génération pseudo-aléatoire
+#include <signal.h>
 
 
 #define TOTAL_COUPS 50
@@ -106,3 +107,9 @@ _Bool generation_des_navires(bateau_en_jeu_t *liste_de_bateau_t);
 void liberation_memoire(bateau_en_jeu_t *ma_liste);
 
 _Bool initialisation_de_la_partie(bateau_en_jeu_t *liste_de_bateau_t);
+
+void afficher_grille_triche(const bateau_en_jeu_t *liste_des_bateaux_t);
+ 
+void signal_sigterm_serveur(int num_signal);
+
+
