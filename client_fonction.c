@@ -4,9 +4,9 @@ void afficher_ecran_titre(){
     printf("\n============================================\n|        BATAILLE NAVALE EN LIGNE !!!       |\n============================================\nEntrer les coordonées de votre premier tir (format XX;YY)\n");
 }
 
-void afficher_ecran_fin(_Bool * victoire_){
+void afficher_ecran_fin(_Bool * victoire){
 
-    if(!(*victoire_)){
+    if(!(*victoire)){
         printf("\n============================================\n");
         printf("|  PARTIE TERMINÉE ! Plus de coups restants. |\n");
         printf("============================================\n");
@@ -98,13 +98,17 @@ _Bool interpreter_la_reponse_serveur(char * buff, reponse_serveur_t * reponse,_B
   
         snprintf(buff,size,"RATÉ, Coup Restant : %d",reponse->coup_restant); //ici pas besoin de forcer le zéro de fin de chaine (contrairement à sprintf classique)
         break;
-    case 1: //touché
+    case 2: //touché
         snprintf(buff,size,"TOUCHÉ, Coup Restant : %d",reponse->coup_restant);
         break;
 
     case 3:// gagné
         snprintf(buff,size,"VICTOIRE !!! Vous avez gagné ! Il vous restait %d coups à jouer",reponse->coup_restant);// le case 3 est spécial : il n'existe aucun enum possèdant la valeur 3 coté serveur, car il s'agit du code victoire
         *victoire=1;
+        break;
+    case 4://perdu
+        snprintf(buff,size,"PERDU !!! Vous n'avez pas détruit tout les bateaux adverses ! Il vous restait %d coups à jouer",reponse->coup_restant);
+        *victoire=0;
         break;
     default: //coulé
         snprintf(buff,size,"COULÉ, Coup Restant : %d",reponse->coup_restant);

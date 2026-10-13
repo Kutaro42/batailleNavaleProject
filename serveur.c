@@ -167,9 +167,7 @@ int main(int argc, char** argv)
 
 				//A CE STADE, ON vERIFIE QUE LE CLIENT n'A PAS DETRUIT LE DERNIER bateau_t
 				if(la_partie_est_elle_finie(&nbr_coup_restant_, &fin_de_partie_, &liste_des_bateaux, &victoire_)){
-					if (fin_de_partie_ && victoire_){
-						envoyer_code_victoire(&reponse);
-					}
+					envoyer_code_victoire_defaite(&reponse,&fin_de_partie_,&victoire_);
 				}
 				//--------------------------------------------------------------------------
 				// Note : cette logique à ses limites : on réécrit sur la structure les informations de victoire : le client ne peut que supposer qu'il à couler le dernier bateau_t, car il recevra directement le code de victoire au lieu de son résultat de tir

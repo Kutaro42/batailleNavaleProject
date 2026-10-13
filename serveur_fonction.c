@@ -3,7 +3,7 @@
 volatile sig_atomic_t nb_joueurs_actifs = 0; //volatile pour éviter de charger dans un registre et ne plus lire la RAM
 // sig_atomic_t garantit que le processeur traite l'opération en un seul bloc (ne pas s'arrêter en pleine lecture/écriture et de corrompre le programme en cas d'interruption)
 
-
+//-----------------------INUTILE-------------------
 //formatte un buffer spécifié en argument; renvoie 0 = faux en cas d'erreur, 1=vrai si tout se passe bien
 _Bool print_nb_coup_restant(char * buff, int nb_coup){
     if(snprintf(buff, TAILLE_BUFF, "Il vous reste %d coups à jouer", nb_coup)){ //correction : taille définie directement par la taille maximum TAILLE_BUFF car sizeof() renvoie une taille de 8bit (comprenhensible car *buf est une adresse sur 8 bit)
@@ -13,7 +13,7 @@ _Bool print_nb_coup_restant(char * buff, int nb_coup){
         return 0; 
     }
     
-}
+}//------------------------------------------------
 
 //renvoie le nbr de coups restants
 int dec_nb_coup_restant(int * nbr_coup_restant){
@@ -84,14 +84,14 @@ bateau_t * trouver_le_bateau_correspondant(position_t * pos, bateau_en_jeu_t * l
     return bateau_cible;
 }
 
-_Bool reste_t_il_un_bateau(bateau_en_jeu_t *bateau_en_jeu_t){
+_Bool reste_t_il_un_bateau(bateau_en_jeu_t *bateau_en_jeu){
 
     //parcourir la liste des bateaux
 
     for(int i = 0; i < NBRE_FREGATES+NBRE_PORTE_AVIONS ; ++i){
         //code :
         for(int j=0 ; j<5 ; ++j){// avec la logique des 5 cases partagées, on n'a plus besoin de s'embêter avec les tailles
-            if(bateau_en_jeu_t->navires[i]->cases_occupee[j]->etat == ACTIVE){ //si on trouve ne serait-ce qu'un seul bateau_t avec une case_t encore active, la partie continue               
+            if(bateau_en_jeu->navires[i]->cases_occupee[j]->etat == ACTIVE){ //si on trouve ne serait-ce qu'un seul bateau_t avec une case_t encore active, la partie continue               
                 return 1; //bateau_t trouvé = reprise de la partie
             }
 
@@ -106,35 +106,43 @@ _Bool reste_t_il_un_bateau(bateau_en_jeu_t *bateau_en_jeu_t){
 }
 
 // 
-_Bool la_partie_est_elle_finie(int * nbr_coup_restant, _Bool * fin_de_partie_, bateau_en_jeu_t * liste_des_bateaux,_Bool * victoire) {
+_Bool la_partie_est_elle_finie(int * nbr_coup_restant, _Bool * fin_de_partie, bateau_en_jeu_t * liste_des_bateaux,_Bool * victoire) {
     
     // On récupère directement le résultat via la valeur de retour de la fonction
     _Bool encore_des_bateaux = reste_t_il_un_bateau(liste_des_bateaux);;
     
     // Vérification des conditions de fin de partie
     if (*nbr_coup_restant <= 0 && encore_des_bateaux) { //cas 1 : il ne reste plus de coups à jouer et il reste des bateaux
-        *fin_de_partie_ = 1; //la fin de la partie
+        *fin_de_partie = 1; //la fin de la partie
         *victoire = 0; //le client a perdu
     }
     else if (*nbr_coup_restant >0 && !encore_des_bateaux){ //cas 2 : il reste encore des coups à jouer, mais le client à détruit tout les navires
         *victoire = 1;// le client à gagné
-        *fin_de_partie_ = 1;
+        *fin_de_partie = 1;
     }
     else {
-        *fin_de_partie_ = 0;// cas 3 : la partie n'est pas finie !
+        *fin_de_partie = 0;// cas 3 : la partie n'est pas finie !
         *victoire = 0;
     }
     
-    return *fin_de_partie_;
+    return *fin_de_partie;
 }
 
 //Insérer un chiffre spécial pour glisser le code de victoire dans la trame sans changer la nature de la structure renvoyée de façon élégante
-void envoyer_code_victoire(reponse_serveur_t *response){
-    response->resultat = 3;// le code spécial de victoire
+void envoyer_code_victoire_defaite(reponse_serveur_t *reponse,_Bool *fin_de_partie,_Bool *victoire){
+    
+    // compte tenu de la difficultée du jeu, une piste d'optimisation serait de tester le cas défaite en premier 
+    if (fin_de_partie && *victoire){
+        reponse->resultat = GAGNEE;// le code spécial de victoire
+    }else {
+        reponse->resultat = PERDU;// le code spécial de défaite
+        
+    }
 
     // on a pas besoin de toucher à la partie contenant le nbr d'essais restant, car le joueur est obligé de faire quelques actions avant de gagner, ce qui garantit que le nbre d'essais restant stocké sera toujours correct.
     // Car s'appuyant sur la dernière valeur du tour précédent.
 }
+
 
 //Alloue l'espace mémoire nécéssaire à la création d'une liste de bateau_t en jeu : les instancies, renvoie 0 si tout s'est bien passé, 1 en cas d'erreur
 _Bool generation_des_navires(bateau_en_jeu_t *liste_de_bateau){
