@@ -274,12 +274,12 @@ void gestionnaire_signaux_fils(int sig) {
 }
 
 
-void afficher_grille_triche(const bateau_en_jeu_t *liste_des_bateaux_t) {
+void afficher_grille_triche(const bateau_en_jeu_t *liste_des_bateaux) {
         printf("\n=== MODE TRICHE : COORDONNÉES DES BATEAUX ===\n");
-        if (liste_des_bateaux_t == NULL) return;
+        if (liste_des_bateaux == NULL) return;
 
         for (int i = 0; i < NBRE_PORTE_AVIONS + NBRE_FREGATES; i++) {
-            const bateau_t *b = liste_des_bateaux_t->bateau_en_jeu_t[i];
+            const bateau_t *b = liste_des_bateaux->navires[i];
             if (b != NULL) {
                 printf("Bateau %d (Type: %d) :\n", i, b->type);
                 for (int j = 0; j < 5; j++) {
