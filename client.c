@@ -14,7 +14,7 @@ int main(int argc, char** argv)
 struct  sockaddr_in moi; /* SAP du client ---> service accès point */
 struct  sockaddr_in serveur; /* SAP du serveur */
 int ret;
-socklen_t * restrict len =NULL;
+socklen_t len;
 _Bool victoire=0;
 
 	if (argc!=4) {
@@ -38,8 +38,8 @@ _Bool victoire=0;
 		perror("bind");
 		exit(1);
 	}
-	*len=sizeof(moi); 
-	getsockname(sock,(struct  sockaddr  *)&moi,len); //on met à jour les informations du socket
+	len=sizeof(moi); 
+	getsockname(sock,(struct  sockaddr  *)&moi,&len); //on met à jour les informations du socket
 
 
 	//AFFICHER L'ÉCRAN TITRE DU JEU :
