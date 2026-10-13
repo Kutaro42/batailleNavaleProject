@@ -2,10 +2,10 @@
 
 #include "serveur_fonction.h"
 
-//VARIABLES GLOBALES
-char* id=0;
-short port=0;
-int sock=0;	/* socket de communication */
+//VARIABLES GLOBALES (static pour les contraindre à une portée de ce fichier uniquement)
+static char* id = 0;
+static short port = 0;
+static int socket_principal = 0;	/* socket de communication */
 
 
 int main(int argc, char** argv)
@@ -36,7 +36,7 @@ int main(int argc, char** argv)
 	id= argv[1];
 	port= atoi(argv[2]);
 
-	if ((sock = socket (AF_INET,SOCK_STREAM,0)) == -1) {
+	if ((socket_principal = socket (AF_INET,SOCK_STREAM,0)) == -1) {
 		fprintf(stderr,"%s: socket %s\n",argv[0],strerror(errno));
 		exit(1);
 	}
@@ -46,13 +46,13 @@ int main(int argc, char** argv)
 	serveur.sin_addr.s_addr = INADDR_ANY;
 	
 	//Ouvrir un descripteur avec le socket configuré
-	if (bind (sock,(struct sockaddr*)&serveur,sizeof(serveur))<0) {
+	if (bind (socket_principal,(struct sockaddr*)&serveur,sizeof(serveur))<0) {
 		fprintf(stderr,"%s: bind %s\n",argv[0],strerror(errno));
 		exit(1);
 	}
 
 	//écouter au maximum 5 tentative de communication en simultané
-   if (listen (sock,5)!=0) {
+   if (listen (socket_principal,5)!=0) {
 		fprintf(stderr,"%s: listen %s\n",argv[0],strerror(errno));
 		exit(1);
    }
@@ -61,11 +61,11 @@ int main(int argc, char** argv)
    //BOUCLE DE CONNECTION (chaque client doit avoir droit à ses 50 coups !)
 	while (1) {
 		struct  sockaddr_in client; /* SAP du client */
-		int     len=sizeof(client);
-		int     sock_pipe;          /* socket de dialogue */
+		int     longeur_du_socket=sizeof(client);
+		int     socket_dialogue_fils;          /* socket de dialogue */
 		int     ret; //ret lit le format binaire dans laquelle la position reçue est encodée (=plus simple et performant), 
 
-    	sock_pipe = accept(sock,(struct sockaddr*)&client,(socklen_t*)&len); //on accepte le traitement des demande du client courant
+    	socket_dialogue_fils = accept(socket_principal,(struct sockaddr*)&client,(socklen_t*)&longeur_du_socket); //on accepte le traitement des demande du client courant
 
 		//VÉRIFICATION DE LA LIMITE DE 5 JOUEURS
 
@@ -75,7 +75,7 @@ int main(int argc, char** argv)
 				inet_ntoa(client.sin_addr), ntohs(client.sin_port));
 			
 			// fermer direct la socket de ce client
-			close(sock_pipe);
+			close(socket_dialogue_fils);
 			continue; // On retourne au début de la boucle pour en attendre un autre
 		}
 
@@ -89,19 +89,19 @@ int main(int argc, char** argv)
 
 		if (pid == -1) {
 			// Le clonage a échoué (plus de mémoire, etc.)
-			close(sock_pipe);
+			close(socket_dialogue_fils);
 			
 		} else if (pid == 0) {
 			// le FILS
 			// Tout ce qui est écrit ici sera exécuté uniquement par le clone
 
 			//fermer le socket copié du père :
-			close(sock); //le fils sert juste à jouer avec le client, ça lui sert à rien
+			close(socket_principal); //le fils sert juste à jouer avec le client, ça lui sert à rien
 
 			//DECLARATION DES VARIABLES GLOBALES DE LA PARTIE
 
-			_Bool fin_de_partie_ =0;
-			_Bool victoire_=0;
+			_Bool fin_de_partie_ = 0;
+			_Bool victoire_ = 0;
 
 			//CHARGEMENT ET INITIALISATION DES PARAMETRES DE JEU
 	
@@ -132,7 +132,7 @@ int main(int argc, char** argv)
 			while (!la_partie_est_elle_finie(&nbr_coup_restant_, &fin_de_partie_, &liste_des_bateaux, &victoire_)) {
 
 				// ON LIT LE MSG DU CLIENT
-				ret=read(sock_pipe,&tir_client,sizeof(position_t));
+				ret=read(socket_dialogue_fils,&tir_client,sizeof(position_t));
 				if (ret<=0) {
 					printf("%s: read=%d: %s\n",argv[0],ret,
 						strerror(errno));
@@ -163,14 +163,11 @@ int main(int argc, char** argv)
 				//--------------------------------------------------------------------------
 				// Note : cette logique à ses limites : on réécrit sur la structure les informations de victoire : le client ne peut que supposer qu'il à couler le dernier bateau_t, car il recevra directement le code de victoire au lieu de son résultat de tir
 
-				// ON RÉPOND AU CLIENT
-				//sprintf(buf_write); --> pas besoin de mise en forme
-
 				//on balance directement en binaire la valeur entière de res = TOUCHEE RATEE COULEE
-				ret=write(sock_pipe,&reponse,sizeof(reponse_serveur_t));
+				ret=write(socket_dialogue_fils,&reponse,sizeof(reponse_serveur_t));
 
 				//si le retour s'est mal passé, on traite l'erreur
-				if (ret<=0) {
+				if (ret <= 0) {
 					printf("%s: write=%d: %s\n",argv[0],ret,
 						strerror(errno));
 					break;
@@ -180,7 +177,7 @@ int main(int argc, char** argv)
 
 			}
 
-			close(sock_pipe);
+			close(socket_dialogue_fils);
 			//nettoyer la liste des bateaux allouée
 			liberation_memoire(&liste_des_bateaux);
 
@@ -189,7 +186,7 @@ int main(int argc, char** argv)
 		} else {
 			// le PÈRE
 			// La variable 'pid' contient l'identifiant du fils qui vient de naître
-			close(sock_pipe);
+			close(socket_dialogue_fils);
 
 		}
 

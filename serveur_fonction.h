@@ -25,7 +25,7 @@
 #define NBRE_FREGATES 1
 
 
-extern int nb_joueurs_actifs;
+extern volatile sig_atomic_t nb_joueurs_actifs;
 
 //--------------------------------------------------------------------------------------------------------
 
@@ -37,44 +37,45 @@ typedef struct{
 
 
 //   Résultat renvoyé par le serveur au client
-enum RESULT_SHOOT{
+enum RESULTAT_TIR{
     RATEE,
     TOUCHEE,
     COULEE,
-    GAGNEE
+    GAGNEE,
+    PERDU
 };
 
 typedef struct{
-    enum RESULT_SHOOT resultat;
+    enum RESULTAT_TIR resultat;
     int coup_restant ;
 } __attribute__((packed)) reponse_serveur_t;
 
-enum TYPE_BOAT{
+enum TYPE_BATEAU{
     FREGATE=3,
     PORTE_AVION=5
 };
 
-enum STATE_CASE{
+enum ETAT_CASE{
     NON_ACTIVE,
     ACTIVE
 };
 
-typedef struct Case {
-    enum STATE_CASE etat;
+typedef struct case_t{
+    enum ETAT_CASE etat;
     position_t position;
-}Case;
+}case_t;
 
 
 typedef struct bateau_t{
-    enum TYPE_BOAT type;
-    struct Case *cases_occupee[5]; //mettre à 5 case, on en activera que 3 pour les frégate (on met des zéro sur les deux dernières)
+    enum TYPE_BATEAU type;
+    struct case_t *cases_occupee[5]; //mettre à 5 case_t, on en activera que 3 pour les frégate (on met des zéro sur les deux dernières)
 
 }bateau_t;
 
 
 
 typedef struct bateau_en_jeu_t{
-    struct bateau_t *bateau_en_jeu_t[NBRE_FREGATES+NBRE_PORTE_AVIONS];
+    struct bateau_t *navires[NBRE_FREGATES+NBRE_PORTE_AVIONS];
 
 }bateau_en_jeu_t;
 

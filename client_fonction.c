@@ -17,7 +17,7 @@ void afficher_ecran_fin(_Bool * victoire_){
     }
 }
 
-_Bool prendre_les_entree_clavier(char *buf_write,position_ *tir_joueur){
+_Bool prendre_les_entree_clavier(char *buf_write,position_t *tir_joueur){
 
     _Bool saisie_correcte = 0; //au départ, on par du principe que c'est incorrecte
     // ALGORITHME DE SAISIE ET DE VALIDATION
@@ -35,7 +35,7 @@ _Bool prendre_les_entree_clavier(char *buf_write,position_ *tir_joueur){
 }
 
 //vérifie qu'une entrée clavier est valide avant l'envoie au serveur pour traitement
-_Bool entree_valide(char *buf_write,position_ *pos){
+_Bool entree_valide(char *buf_write,position_t *pos){
 
     //def des variables d'usage :
     int x_saisi, y_saisi;
@@ -70,7 +70,7 @@ _Bool entree_valide(char *buf_write,position_ *pos){
     }
     return saisie_valide;
 }
-_Bool traitement_entree_clavier(char *buf_write,position_ *pos){
+_Bool traitement_entree_clavier(char *buf_write,position_t *pos){
 
  
     fflush(stdout); // Force l'affichage immédiat du texte à l'écran
@@ -86,7 +86,7 @@ _Bool traitement_entree_clavier(char *buf_write,position_ *pos){
 }
 
 //prend la réponse serveur et l'adresse d'un buffer en paramètre et le formatte en fonction des données de jeu
-_Bool interpreter_la_reponse_serveur(char * buff, ReponseServeur * reponse,_Bool * victoire){
+_Bool interpreter_la_reponse_serveur(char * buff, reponse_serveur_t * reponse,_Bool * victoire){
     //préparer le stockage des valeurs
     int size =256;//on balance une taille conséquente pour éviter l'overloading du buffer, de toute façon snprintf gère ça tout seul sur ce qui sera réellement écrit
 

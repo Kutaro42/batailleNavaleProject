@@ -1,6 +1,8 @@
 #include "serveur_fonction.h"
 
-int nb_joueurs_actifs =0;
+volatile sig_atomic_t nb_joueurs_actifs = 0; //volatile pour éviter de charger dans un registre et ne plus lire la RAM
+// sig_atomic_t garantit que le processeur traite l'opération en un seul bloc (ne pas s'arrêter en pleine lecture/écriture et de corrompre le programme en cas d'interruption)
+
 
 //formatte un buffer spécifié en argument; renvoie 0 = faux en cas d'erreur, 1=vrai si tout se passe bien
 _Bool print_nb_coup_restant(char * buff, int nb_coup){
@@ -15,23 +17,22 @@ _Bool print_nb_coup_restant(char * buff, int nb_coup){
 
 //renvoie le nbr de coups restants
 int dec_nb_coup_restant(int * nbr_coup_restant){
-    *nbr_coup_restant= *nbr_coup_restant-1;
+    *nbr_coup_restant = *nbr_coup_restant - 1;
     return *nbr_coup_restant;
 }
 
 
 //Renvoie 1 si toute les cases du bateau_t sont détruites, 0 sinon
 _Bool le_bateau_est_il_coulee(bateau_t * le_bateau){
-    //code :
     
-    for(int i=0;i<(int)le_bateau->type;++i){// astuce de conception : j'ai eu l'idée de placer directement la taille active du bateau_t dans l'enum de sont type, rendant la taille implicite au type de bateau_t.
+    for(int i = 0 ; i < (int)le_bateau->type ; ++i){// astuce de conception : j'ai eu l'idée de placer directement la taille active du bateau_t dans l'enum de sont type, rendant la taille implicite au type de bateau_t.
         if(le_bateau->cases_occupee[i]->etat==ACTIVE){ //cette fonction sera appelée très souvent, on cherche donc à éliminer le cas le plus probable en premier
-            //code
+            
             return 0;
 
         }
     }
-    //si pas une seule fois la boucle n'a détecté de case active :
+    //si pas une seule fois la boucle n'a détecté de case_t active :
     return 1; //on est alors certain que le bateau_t est détruit.
 
 }
@@ -40,16 +41,16 @@ _Bool le_bateau_est_il_coulee(bateau_t * le_bateau){
 int resultat_du_tir(position_t *pos, bateau_en_jeu_t *liste_des_bateau){
 
     //variable résultat
-    enum RESULT_SHOOT result; 
+    enum RESULTAT_TIR result; 
 
     //recherche de l'éventuel bateau_t
     bateau_t * cible=trouver_le_bateau_correspondant(pos,liste_des_bateau);
 
     //vérifier si la position correspond à un bateau_t
-    if(cible == NULL){          //si aucun bateau_t n'a cette case (cas le plus probable)
+    if(cible == NULL){          //si aucun bateau_t n'a cette case_t (cas le plus probable)
         result=RATEE;
     }
-    if(cible != NULL){          //si une case de bateau_t est présente
+    if(cible != NULL){          //si une case_t de bateau_t est présente
         result=TOUCHEE;
 
         if (le_bateau_est_il_coulee(cible))
@@ -61,20 +62,20 @@ int resultat_du_tir(position_t *pos, bateau_en_jeu_t *liste_des_bateau){
     return result;
 }
 
-//Identifie le bateau_t correspondant à la case spécifiée en paramètre, renvoie un pointeur vers la cible si trouvé, nullptr sinon.
+//Identifie le bateau_t correspondant à la case_t spécifiée en paramètre, renvoie un pointeur vers la cible si trouvé, nullptr sinon.
 bateau_t * trouver_le_bateau_correspondant(position_t * pos, bateau_en_jeu_t * liste_bateau){
     //stocker l'adresse du bateau_t trouvé ici
     bateau_t * bateau_cible=NULL;
 
     //code
-    for(int i=0;i<NBRE_FREGATES+NBRE_PORTE_AVIONS;++i){
+    for(int i = 0 ; i < NBRE_FREGATES + NBRE_PORTE_AVIONS ; ++i){
         for(int j=0;j<5;++j){
-            if(liste_bateau->bateau_en_jeu_t[i]->cases_occupee[j]->position.x == pos->x &&
-               liste_bateau->bateau_en_jeu_t[i]->cases_occupee[j]->position.y == pos->y &&
-               liste_bateau->bateau_en_jeu_t[i]->cases_occupee[j]->etat == ACTIVE //parce qu'on voudrait éviter au joueur de frapper la même case en boucle
+            if(liste_bateau->navires[i]->cases_occupee[j]->position.x == pos->x &&
+               liste_bateau->navires[i]->cases_occupee[j]->position.y == pos->y &&
+               liste_bateau->navires[i]->cases_occupee[j]->etat == ACTIVE //parce qu'on voudrait éviter au joueur de frapper la même case_t en boucle
             ){
-                bateau_cible=liste_bateau->bateau_en_jeu_t[i];// renvoyer le bateau_t trouvé
-                liste_bateau->bateau_en_jeu_t[i]->cases_occupee[j]->etat=NON_ACTIVE; //on désactive au passage la case (car on utilise pour le moment cette fonction uniquement pour désactiver des cases, mais cette logique pourrait poser des problème si on décide de rajouter un système d'affichage des cases)
+                bateau_cible=liste_bateau->navires[i];// renvoyer le bateau_t trouvé
+                liste_bateau->navires[i]->cases_occupee[j]->etat=NON_ACTIVE; //on désactive au passage la case_t (car on utilise pour le moment cette fonction uniquement pour désactiver des cases, mais cette logique pourrait poser des problème si on décide de rajouter un système d'affichage des cases)
 
             }
         }
@@ -87,10 +88,10 @@ _Bool reste_t_il_un_bateau(bateau_en_jeu_t *bateau_en_jeu_t){
 
     //parcourir la liste des bateaux
 
-    for(int i=0;i<NBRE_FREGATES+NBRE_PORTE_AVIONS;++i){
+    for(int i = 0; i < NBRE_FREGATES+NBRE_PORTE_AVIONS ; ++i){
         //code :
-        for(int j=0;j<5;++j){// avec la logique des 5 cases partagées, on n'a plus besoin de s'embêter avec les tailles
-            if(bateau_en_jeu_t->bateau_en_jeu_t[i]->cases_occupee[j]->etat == ACTIVE){ //si on trouve ne serait-ce qu'un seul bateau_t avec une case encore active, la partie continue               
+        for(int j=0 ; j<5 ; ++j){// avec la logique des 5 cases partagées, on n'a plus besoin de s'embêter avec les tailles
+            if(bateau_en_jeu_t->navires[i]->cases_occupee[j]->etat == ACTIVE){ //si on trouve ne serait-ce qu'un seul bateau_t avec une case_t encore active, la partie continue               
                 return 1; //bateau_t trouvé = reprise de la partie
             }
 
@@ -117,7 +118,7 @@ _Bool la_partie_est_elle_finie(int * nbr_coup_restant, _Bool * fin_de_partie_, b
     }
     else if (*nbr_coup_restant >0 && !encore_des_bateaux){ //cas 2 : il reste encore des coups à jouer, mais le client à détruit tout les navires
         *victoire = 1;// le client à gagné
-        *fin_de_partie_ =1;
+        *fin_de_partie_ = 1;
     }
     else {
         *fin_de_partie_ = 0;// cas 3 : la partie n'est pas finie !
@@ -149,11 +150,11 @@ if (liste_de_bateau == NULL) return 1;
         b->type = PORTE_AVION; 
 
         for (int j = 0; j < 5; j++) {
-            b->cases_occupee[j] = (Case *)malloc(sizeof(Case));
+            b->cases_occupee[j] = (case_t *)malloc(sizeof(case_t));
             if (b->cases_occupee[j] == NULL) return 1;
             b->cases_occupee[j]->etat = ACTIVE;
         }
-        liste_de_bateau->bateau_en_jeu_t[index++] = b;
+        liste_de_bateau->navires[index++] = b;
     }
 
     // Instanciation des frégates (taille 3 active + 2 cases inactives)
@@ -164,7 +165,7 @@ if (liste_de_bateau == NULL) return 1;
         b->type = FREGATE; // Type = 3
 
         for (int j = 0; j < 5; j++) {
-            b->cases_occupee[j] = (Case *)malloc(sizeof(Case));
+            b->cases_occupee[j] = (case_t *)malloc(sizeof(case_t));
             if (b->cases_occupee[j] == NULL) return 1;
 
             if (j < 3) {
@@ -173,7 +174,7 @@ if (liste_de_bateau == NULL) return 1;
                 b->cases_occupee[j]->etat = NON_ACTIVE;
             }
         }
-        liste_de_bateau->bateau_en_jeu_t[index++] = b;
+        liste_de_bateau->navires[index++] = b;
     }
 
     return 0;
@@ -192,7 +193,7 @@ if (liste_de_bateau == NULL) return 1;
     }
 
     for (int i = 0; i < NBRE_PORTE_AVIONS + NBRE_FREGATES; i++) {
-        bateau_t *b = liste_de_bateau->bateau_en_jeu_t[i];
+        bateau_t *b = liste_de_bateau->navires[i];
         if (b == NULL) return 1;
         int taille = 0;
         if(b->type == PORTE_AVION){
@@ -245,11 +246,11 @@ if (liste_de_bateau == NULL) return 1;
 
 void liberation_memoire(bateau_en_jeu_t *ma_liste){
     for (int i = 0; i < (NBRE_FREGATES + NBRE_PORTE_AVIONS); i++) {
-        if (ma_liste->bateau_en_jeu_t[i] != NULL) {
+        if (ma_liste->navires[i] != NULL) {
             for (int j = 0; j < 5; j++) {
-                free(ma_liste->bateau_en_jeu_t[i]->cases_occupee[j]);
+                free(ma_liste->navires[i]->cases_occupee[j]);
             }
-            free(ma_liste->bateau_en_jeu_t[i]);
+            free(ma_liste->navires[i]);
         }
     }
 }

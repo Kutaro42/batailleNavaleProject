@@ -4,17 +4,17 @@
 
 
 char* id=0;
-short sport=0;
+short port_de_sortie=0;
 _Bool connection_fermee = 0; //renseigne l'état de la connection (=indicateur de l'état de connection en tps réel)
 
-int sock=0;	/* socket de communication */
+int socket_principal=0;	/* socket de communication */
 
 int main(int argc, char** argv)
 {
 struct  sockaddr_in moi; /* SAP du client ---> service accès point */
 struct  sockaddr_in serveur; /* SAP du serveur */
 int ret;
-socklen_t len;
+socklen_t longueur_socket;
 _Bool victoire=0;
 
 	if (argc!=4) {
@@ -22,24 +22,24 @@ _Bool victoire=0;
 		exit(1);
 	}
 	id= argv[1];	//id=argument 1
-	sport= atoi(argv[3]); // prendre le 3eme arg et le convertir en valeur entière
+	port_de_sortie= atoi(argv[3]); // prendre le 3eme arg et le convertir en valeur entière
 
-	if ((sock = socket (AF_INET,SOCK_STREAM,0)) == -1) { //configurer un socket en ipv4, avec un TCP, avec la valeur par défaut 0;
+	if ((socket_principal = socket (AF_INET,SOCK_STREAM,0)) == -1) { //configurer un socket en ipv4, avec un TCP, avec la valeur par défaut 0;
 		fprintf(stderr,"%s: socket %s\n",argv[0],
 			strerror(errno));
 		exit(1); //si le programme rentre dans ce if, la création du socket s'est mal passée
 	}
 	serveur.sin_family = AF_INET; //configuration du protocole de communication IPv4
-	serveur.sin_port = htons(sport); // direction du port de sortie (s) (renversé dans l'ordre Big endian pour protocole réseau)
+	serveur.sin_port = htons(port_de_sortie); // direction du port de sortie (s) (renversé dans l'ordre Big endian pour protocole réseau)
 	inet_aton(argv[2],&serveur.sin_addr); //communique avec l'interface serveur
 	
-	if (connect(sock,(struct sockaddr *)&serveur,sizeof(serveur))<0) { //si la connection échoue, traiter l'erreur
+	if (connect(socket_principal,(struct sockaddr *)&serveur,sizeof(serveur))<0) { //si la connection échoue, traiter l'erreur
 		fprintf(stderr,"%s: connect %s\n",argv[0],strerror(errno));
 		perror("bind");
 		exit(1);
 	}
-	len=sizeof(moi); 
-	getsockname(sock,(struct  sockaddr  *)&moi,&len); //on met à jour les informations du socket
+	longueur_socket=sizeof(moi); 
+	getsockname(socket_principal,(struct  sockaddr  *)&moi,&longueur_socket); //on met à jour les informations du socket
 
 
 	//AFFICHER L'ÉCRAN TITRE DU JEU :
@@ -49,13 +49,13 @@ _Bool victoire=0;
 	while(!connection_fermee) {
 		char    buf_lecture[1<<8], buf_ecriture[1<<6];// 5 caractères en réalité, car le 6ème est remplacé par un zéro (ligne 62) pour gérer la fin de chaine
 
-		ReponseServeur reponse;
+		reponse_serveur_t reponse;
 
 		// PRISE D'ENTREE CLAVIER POUR LE JOUEUR
 		//on prend le flux clavier et on en écrit le contenu dans le buffer
 		//forme de l'input : [x;y]
 		
-		position_ position_visee;
+		position_t position_visee;
 		if(prendre_les_entree_clavier(buf_ecriture,&position_visee)){
 			continue;
 		}
@@ -78,12 +78,12 @@ _Bool victoire=0;
 			inet_ntoa(serveur.sin_addr),ntohs(serveur.sin_port),
 			buf_ecriture);
 
-		// Au lieu de : ret = write(sock, buf_ecriture, strlen(buf_ecriture));
-		// On envoie directement les 8 octets de la structure position_ :
+		// Au lieu de : ret = write(socket_principal, buf_ecriture, strlen(buf_ecriture));
+		// On envoie directement les 8 octets de la structure position_t :
 
-		ret = write(sock, &position_visee, sizeof(position_)); 
+		ret = write(socket_principal, &position_visee, sizeof(position_t)); 
 
-		if (ret < (int)sizeof(position_)) { // cast sur un entier pour faire la comparaison avec les mêmes type
+		if (ret < (int)sizeof(position_t)) { // cast sur un entier pour faire la comparaison avec les mêmes type
 			printf("\n%s: erreur dans write binaire (num=%d, mess=%s)\n",
 				argv[0], ret, strerror(errno));
 			continue;
@@ -96,7 +96,7 @@ _Bool victoire=0;
 				inet_ntoa(moi.sin_addr),ntohs(moi.sin_port));
 
 				//ici on doit s'attendre à recevoir le message retour du serveur sous forme de structure reponse.
-		ret=read(sock,&reponse,sizeof(ReponseServeur));	//on lit la structure binaire <reponse> dans le descripteur standard du socket serveur (serveur)
+		ret=read(socket_principal,&reponse,sizeof(reponse_serveur_t));	//on lit la structure binaire <reponse> dans le descripteur standard du socket serveur (serveur)
 
 
 		//vérifiation
@@ -135,7 +135,7 @@ _Bool victoire=0;
 	
 
 
-	close(sock);//on ferme le socket de communication
+	close(socket_principal);//on ferme le socket de communication
 	printf(" j ai fini, bye\n");//petit msg sympa qui était déjà présent dans le code du prof
 	return 0;
 }
