@@ -185,11 +185,7 @@ if (liste_de_bateau == NULL) return 1;
 
 
     // Initialisation du générateur de nombres aléatoires
-    static int rand_init = 0;
-    if (!rand_init) {
-        srand(time(NULL));
-        rand_init = 1;
-    }
+srand(time(NULL));
 
     for (int i = 0; i < NBRE_PORTE_AVIONS + NBRE_FREGATES; i++) {
         bateau_t *b = liste_de_bateau->bateau_en_jeu_t[i];
