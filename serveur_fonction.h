@@ -18,7 +18,7 @@
 #include <time.h> //pour la génération pseudo-aléatoire
 
 
-#define TOTAL_COUPS 50
+#define TOTAL_COUPS 4
 #define TAILLE_GRILLE 20
 #define TAILLE_BUFF 50
 #define NBRE_PORTE_AVIONS 1
@@ -87,7 +87,7 @@ void gestionnaire_signaux_fils(int sig);
 
 _Bool la_partie_est_elle_finie(int * nbr_coup_restant, _Bool * fin_de_partie_, bateau_en_jeu_t * liste_des_bateau_tx,_Bool * victoire);
 
-void envoyer_code_victoire(reponse_serveur_t *response);
+void envoyer_code_victoire_defaite(reponse_serveur_t *reponse,_Bool *fin_de_partie,_Bool *victoire);
 
 _Bool reste_t_il_un_bateau_t(bateau_en_jeu_t *bateau_en_jeu_t);
 

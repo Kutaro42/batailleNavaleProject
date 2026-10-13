@@ -16,6 +16,7 @@ struct  sockaddr_in serveur; /* SAP du serveur */
 int ret;
 socklen_t longueur_socket;
 _Bool victoire=0;
+//_Bool defaite=0; //on l'ajoute pour gérer les états de jeu plus facilement
 
 	if (argc!=4) {
 		fprintf(stderr,"usage: %s id serveur port\n",argv[0]); //si il n'ya pas 4 arg, rediriger vers la sortie d'erreur le msg et quitter avec un code 1
@@ -100,7 +101,7 @@ _Bool victoire=0;
 
 
 		//vérifiation
-		if (ret<=0) {
+		if (ret <= 0) {
 			printf("\n%s:  erreur dans read (num=%d, mess=%s)\n",// on traite l'erreur en cas d'échec = connection avec l'hôte certainement perdue !
 				argv[0],ret,strerror(errno));
 			break;
@@ -126,14 +127,6 @@ _Bool victoire=0;
 	// si le serveur à envoyé le code spécial, on déclenche la victoire :
 	
 	afficher_ecran_fin(&victoire);
-	//REMARQUE IMPORTANTE :
-	// La trame de communication que j'avait proposé au départ ne contenait que le résultat du tir, et le nbre de doups restant,
-	// mais la limite de ce système s'est très vite montré quand il à fallu communiquer la victoire au client.
-	// J'ai donc rfléchit à un moyen de communiquer cette victoire, sans changer ma structure :
-	// la solution élégante que j'ai trouvé consiste à glisser un code spécial arbitraire (ici = 3) à la place du résultat du tir.
-	// De cette façon, il suffisait juste d'ajouter un code gestionnaire de cette exception coté client, et le tour était joué ! 
-	
-
 
 	close(socket_principal);//on ferme le socket de communication
 	printf(" j ai fini, bye\n");//petit msg sympa qui était déjà présent dans le code du prof
