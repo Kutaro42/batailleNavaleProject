@@ -21,7 +21,8 @@ typedef struct{ //l'attribut "packed" supprime la mémoire vide qui pourrait se 
 enum RESULT_SHOOT{
     RATEE,
     TOUCHEE,
-    COULEE
+    COULEE,
+    GAGNEE
 };
 
 typedef struct{

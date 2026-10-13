@@ -5,7 +5,7 @@
 
 char* id=0;
 short sport=0;
-_Bool connection_closed = 0; //renseigne l'état de la connection (=indicateur de l'état de connection en tps réel)
+_Bool connection_fermee = 0; //renseigne l'état de la connection (=indicateur de l'état de connection en tps réel)
 
 int sock=0;	/* socket de communication */
 
@@ -13,8 +13,8 @@ int main(int argc, char** argv)
 {
 struct  sockaddr_in moi; /* SAP du client ---> service accès point */
 struct  sockaddr_in serveur; /* SAP du serveur */
-int nb_question=0;
-int ret,len;
+int ret;
+socklen_t * restrict len =NULL;
 _Bool victoire=0;
 
 	if (argc!=4) {
@@ -38,16 +38,16 @@ _Bool victoire=0;
 		perror("bind");
 		exit(1);
 	}
-	len=sizeof(moi); 
-	getsockname(sock,(struct  sockaddr  *)&moi,&len); //on met à jour les information du socket
+	*len=sizeof(moi); 
+	getsockname(sock,(struct  sockaddr  *)&moi,len); //on met à jour les informations du socket
 
 
 	//AFFICHER L'ÉCRAN TITRE DU JEU :
 	afficher_ecran_titre();
 
     //Tant que la connection n'est pas interrompue (par un code de sortie du serveur), répéter :
-	while(!connection_closed) {
-		char    buf_read[1<<8], buf_write[1<<6];// 5 caractères en réalité, car le 6ème est remplacé par un zéro (ligne 62) pour gérer la fin de chaine
+	while(!connection_fermee) {
+		char    buf_lecture[1<<8], buf_ecriture[1<<6];// 5 caractères en réalité, car le 6ème est remplacé par un zéro (ligne 62) pour gérer la fin de chaine
 
 		ReponseServeur reponse;
 
@@ -56,7 +56,7 @@ _Bool victoire=0;
 		//forme de l'input : [x;y]
 		
 		position_ position_visee;
-		if(prendre_les_entree_clavier(buf_write,&position_visee)){
+		if(prendre_les_entree_clavier(buf_ecriture,&position_visee)){
 			continue;
 		}
 
@@ -71,19 +71,19 @@ _Bool victoire=0;
 
         // PARTIE GESTION CLIENT |==> on vise à long terme une gestion sécurisé des entrées clavier du joueur, pour éviter et empêcher les erreurs de saisie avant qu'elles soient envoyées au serveur.
 
-		//sprintf(buf_write,":%s",id); //coordonées x;y ==> temporairement 'buf_write' pour vérifier, résultat de la couche de sécurité dans un second temps.
+		//sprintf(buf_ecriture,":%s",id); //coordonées x;y ==> temporairement 'buf_ecriture' pour vérifier, résultat de la couche de sécurité dans un second temps.
 		printf(" client %2s: (%s:%4d) envoie a  ", id,      //debug
 			inet_ntoa(moi.sin_addr),ntohs(moi.sin_port));   //debug
 		printf("(%s:%4d) : %s\n",                           //debug
 			inet_ntoa(serveur.sin_addr),ntohs(serveur.sin_port),
-			buf_write);
+			buf_ecriture);
 
-		// Au lieu de : ret = write(sock, buf_write, strlen(buf_write));
+		// Au lieu de : ret = write(sock, buf_ecriture, strlen(buf_ecriture));
 		// On envoie directement les 8 octets de la structure position_ :
 
 		ret = write(sock, &position_visee, sizeof(position_)); 
 
-		if (ret < sizeof(position_)) {
+		if (ret < (int)sizeof(position_)) { // cast sur un entier pour faire la comparaison avec les mêmes type
 			printf("\n%s: erreur dans write binaire (num=%d, mess=%s)\n",
 				argv[0], ret, strerror(errno));
 			continue;
@@ -108,12 +108,12 @@ _Bool victoire=0;
 
 
 		//formatter le buffer pour afficher une chaine propre :
-		interpreter_la_reponse_serveur(buf_read, &reponse,&victoire);
+		interpreter_la_reponse_serveur(buf_lecture, &reponse,&victoire);
 
 		
 		//afficher le résultat :
 		printf("(%s:%4d) : %s\n",inet_ntoa(serveur.sin_addr),
-			ntohs(serveur.sin_port),buf_read);
+			ntohs(serveur.sin_port),buf_lecture);
 
 		// Dans le cas ou le nbre de coups renvoyé atteind 0 :
 		if (victoire || reponse.coup_restant <= 0) {

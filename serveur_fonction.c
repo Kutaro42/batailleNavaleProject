@@ -20,11 +20,11 @@ int dec_nb_coup_restant(int * nbr_coup_restant){
 }
 
 
-//Renvoie 1 si toute les cases du bateau sont détruites, 0 sinon
-_Bool le_bateau_est_il_coulee(Bateau * le_bateau){
+//Renvoie 1 si toute les cases du bateau_t sont détruites, 0 sinon
+_Bool le_bateau_est_il_coulee(bateau_t * le_bateau){
     //code :
     
-    for(int i=0;i<le_bateau->type;++i){// astuce de conception : j'ai eu l'idée de placer directement la taille active du bateau dans l'enum de sont type, rendant la taille implicite au type de bateau.
+    for(int i=0;i<(int)le_bateau->type;++i){// astuce de conception : j'ai eu l'idée de placer directement la taille active du bateau_t dans l'enum de sont type, rendant la taille implicite au type de bateau_t.
         if(le_bateau->cases_occupee[i]->etat==ACTIVE){ //cette fonction sera appelée très souvent, on cherche donc à éliminer le cas le plus probable en premier
             //code
             return 0;
@@ -32,24 +32,24 @@ _Bool le_bateau_est_il_coulee(Bateau * le_bateau){
         }
     }
     //si pas une seule fois la boucle n'a détecté de case active :
-    return 1; //on est alors certain que le bateau est détruit.
+    return 1; //on est alors certain que le bateau_t est détruit.
 
 }
 
 //Renvoie le résultat du tir effectué par le joueur depuis le client
-int resultat_du_tir(position_ *pos, bateau_en_jeu_ *liste_des_bateau){
+int resultat_du_tir(position_t *pos, bateau_en_jeu_t *liste_des_bateau){
 
     //variable résultat
     enum RESULT_SHOOT result; 
 
-    //recherche de l'éventuel bateau
-    Bateau * cible=trouver_le_bateau_correspondant(pos,liste_des_bateau);
+    //recherche de l'éventuel bateau_t
+    bateau_t * cible=trouver_le_bateau_correspondant(pos,liste_des_bateau);
 
-    //vérifier si la position correspond à un bateau
-    if(cible == NULL){          //si aucun bateau n'a cette case (cas le plus probable)
+    //vérifier si la position correspond à un bateau_t
+    if(cible == NULL){          //si aucun bateau_t n'a cette case (cas le plus probable)
         result=RATEE;
     }
-    if(cible != NULL){          //si une case de bateau est présente
+    if(cible != NULL){          //si une case de bateau_t est présente
         result=TOUCHEE;
 
         if (le_bateau_est_il_coulee(cible))
@@ -61,20 +61,20 @@ int resultat_du_tir(position_ *pos, bateau_en_jeu_ *liste_des_bateau){
     return result;
 }
 
-//Identifie le bateau correspondant à la case spécifiée en paramètre, renvoie un pointeur vers la cible si trouvé, nullptr sinon.
-Bateau * trouver_le_bateau_correspondant(position_ * pos, bateau_en_jeu_ * liste_bateau){
-    //stocker l'adresse du bateau trouvé ici
-    Bateau * bateau_cible=NULL;
+//Identifie le bateau_t correspondant à la case spécifiée en paramètre, renvoie un pointeur vers la cible si trouvé, nullptr sinon.
+bateau_t * trouver_le_bateau_correspondant(position_t * pos, bateau_en_jeu_t * liste_bateau){
+    //stocker l'adresse du bateau_t trouvé ici
+    bateau_t * bateau_cible=NULL;
 
     //code
     for(int i=0;i<NBRE_FREGATES+NBRE_PORTE_AVIONS;++i){
         for(int j=0;j<5;++j){
-            if(liste_bateau->Bateau_en_jeu[i]->cases_occupee[j]->position.x == pos->x &&
-               liste_bateau->Bateau_en_jeu[i]->cases_occupee[j]->position.y == pos->y &&
-               liste_bateau->Bateau_en_jeu[i]->cases_occupee[j]->etat == ACTIVE //parce qu'on voudrait éviter au joueur de frapper la même case en boucle
+            if(liste_bateau->bateau_en_jeu_t[i]->cases_occupee[j]->position.x == pos->x &&
+               liste_bateau->bateau_en_jeu_t[i]->cases_occupee[j]->position.y == pos->y &&
+               liste_bateau->bateau_en_jeu_t[i]->cases_occupee[j]->etat == ACTIVE //parce qu'on voudrait éviter au joueur de frapper la même case en boucle
             ){
-                bateau_cible=liste_bateau->Bateau_en_jeu[i];// renvoyer le bateau trouvé
-                liste_bateau->Bateau_en_jeu[i]->cases_occupee[j]->etat=NON_ACTIVE; //on désactive au passage la case (car on utilise pour le moment cette fonction uniquement pour désactiver des cases, mais cette logique pourrait poser des problème si on décide de rajouter un système d'affichage des cases)
+                bateau_cible=liste_bateau->bateau_en_jeu_t[i];// renvoyer le bateau_t trouvé
+                liste_bateau->bateau_en_jeu_t[i]->cases_occupee[j]->etat=NON_ACTIVE; //on désactive au passage la case (car on utilise pour le moment cette fonction uniquement pour désactiver des cases, mais cette logique pourrait poser des problème si on décide de rajouter un système d'affichage des cases)
 
             }
         }
@@ -83,29 +83,29 @@ Bateau * trouver_le_bateau_correspondant(position_ * pos, bateau_en_jeu_ * liste
     return bateau_cible;
 }
 
-_Bool reste_t_il_un_bateau(bateau_en_jeu_ *bateau_en_jeu){
+_Bool reste_t_il_un_bateau(bateau_en_jeu_t *bateau_en_jeu_t){
 
     //parcourir la liste des bateaux
 
     for(int i=0;i<NBRE_FREGATES+NBRE_PORTE_AVIONS;++i){
         //code :
         for(int j=0;j<5;++j){// avec la logique des 5 cases partagées, on n'a plus besoin de s'embêter avec les tailles
-            if(bateau_en_jeu->Bateau_en_jeu[i]->cases_occupee[j]->etat == ACTIVE){ //si on trouve ne serait-ce qu'un seul bateau avec une case encore active, la partie continue               
-                return 1; //bateau trouvé = reprise de la partie
+            if(bateau_en_jeu_t->bateau_en_jeu_t[i]->cases_occupee[j]->etat == ACTIVE){ //si on trouve ne serait-ce qu'un seul bateau_t avec une case encore active, la partie continue               
+                return 1; //bateau_t trouvé = reprise de la partie
             }
 
         }
 
     }
 
-    //DANS LE CAS OU IL NE RESTE AUCUN BATEAU
+    //DANS LE CAS OU IL NE RESTE AUCUN bateau_t
 
     return 0; //on renvoie sa valeur comme code de sortie booléen pour traitement
 
 }
 
 // 
-_Bool la_partie_est_elle_finie(int * nbr_coup_restant, _Bool * fin_de_partie_, bateau_en_jeu_ * liste_des_bateaux,_Bool * victoire) {
+_Bool la_partie_est_elle_finie(int * nbr_coup_restant, _Bool * fin_de_partie_, bateau_en_jeu_t * liste_des_bateaux,_Bool * victoire) {
     
     // On récupère directement le résultat via la valeur de retour de la fonction
     _Bool encore_des_bateaux = reste_t_il_un_bateau(liste_des_bateaux);;
@@ -128,22 +128,22 @@ _Bool la_partie_est_elle_finie(int * nbr_coup_restant, _Bool * fin_de_partie_, b
 }
 
 //Insérer un chiffre spécial pour glisser le code de victoire dans la trame sans changer la nature de la structure renvoyée de façon élégante
-void envoyer_code_victoire(ReponseServeur *response){
+void envoyer_code_victoire(reponse_serveur_t *response){
     response->resultat = 3;// le code spécial de victoire
 
     // on a pas besoin de toucher à la partie contenant le nbr d'essais restant, car le joueur est obligé de faire quelques actions avant de gagner, ce qui garantit que le nbre d'essais restant stocké sera toujours correct.
     // Car s'appuyant sur la dernière valeur du tour précédent.
 }
 
-//Alloue l'espace mémoire nécéssaire à la création d'une liste de bateau en jeu : les instancies, renvoie 0 si tout s'est bien passé, 1 en cas d'erreur
-_Bool generation_des_navires(bateau_en_jeu_ *liste_de_bateau){
+//Alloue l'espace mémoire nécéssaire à la création d'une liste de bateau_t en jeu : les instancies, renvoie 0 si tout s'est bien passé, 1 en cas d'erreur
+_Bool generation_des_navires(bateau_en_jeu_t *liste_de_bateau){
 if (liste_de_bateau == NULL) return 1;
 
     int index = 0;
 
     // Instanciation des portes-avions (taille 5)
     for (int i = 0; i < NBRE_PORTE_AVIONS; i++) {
-        Bateau *b = (Bateau *)malloc(sizeof(Bateau));
+        bateau_t *b = (bateau_t *)malloc(sizeof(bateau_t));
         if (b == NULL) return 1;
 
         b->type = PORTE_AVION; 
@@ -153,12 +153,12 @@ if (liste_de_bateau == NULL) return 1;
             if (b->cases_occupee[j] == NULL) return 1;
             b->cases_occupee[j]->etat = ACTIVE;
         }
-        liste_de_bateau->Bateau_en_jeu[index++] = b;
+        liste_de_bateau->bateau_en_jeu_t[index++] = b;
     }
 
     // Instanciation des frégates (taille 3 active + 2 cases inactives)
     for (int i = 0; i < NBRE_FREGATES; i++) {
-        Bateau *b = (Bateau *)malloc(sizeof(Bateau));
+        bateau_t *b = (bateau_t *)malloc(sizeof(bateau_t));
         if (b == NULL) return 1;
 
         b->type = FREGATE; // Type = 3
@@ -173,14 +173,14 @@ if (liste_de_bateau == NULL) return 1;
                 b->cases_occupee[j]->etat = NON_ACTIVE;
             }
         }
-        liste_de_bateau->Bateau_en_jeu[index++] = b;
+        liste_de_bateau->bateau_en_jeu_t[index++] = b;
     }
 
     return 0;
 }
 
 //Attribue aux navires des coordonées sur la grille de jeu fictive, renvoie 0 si tout s'est bien passé, 1 en cas d'erreur
-_Bool initialisation_de_la_partie(bateau_en_jeu_ *liste_de_bateau){
+_Bool initialisation_de_la_partie(bateau_en_jeu_t *liste_de_bateau){
 if (liste_de_bateau == NULL) return 1;
 
 
@@ -192,7 +192,7 @@ if (liste_de_bateau == NULL) return 1;
     }
 
     for (int i = 0; i < NBRE_PORTE_AVIONS + NBRE_FREGATES; i++) {
-        Bateau *b = liste_de_bateau->Bateau_en_jeu[i];
+        bateau_t *b = liste_de_bateau->bateau_en_jeu_t[i];
         if (b == NULL) return 1;
         int taille = 0;
         if(b->type == PORTE_AVION){
@@ -243,13 +243,13 @@ if (liste_de_bateau == NULL) return 1;
     return 0; // Succès
 }
 
-_Bool liberation_memoire(bateau_en_jeu_ *ma_liste){
+void liberation_memoire(bateau_en_jeu_t *ma_liste){
     for (int i = 0; i < (NBRE_FREGATES + NBRE_PORTE_AVIONS); i++) {
-        if (ma_liste->Bateau_en_jeu[i] != NULL) {
+        if (ma_liste->bateau_en_jeu_t[i] != NULL) {
             for (int j = 0; j < 5; j++) {
-                free(ma_liste->Bateau_en_jeu[i]->cases_occupee[j]);
+                free(ma_liste->bateau_en_jeu_t[i]->cases_occupee[j]);
             }
-            free(ma_liste->Bateau_en_jeu[i]);
+            free(ma_liste->bateau_en_jeu_t[i]);
         }
     }
 }
@@ -257,6 +257,8 @@ _Bool liberation_memoire(bateau_en_jeu_ *ma_liste){
 
 // Définition du gestionnaire de signal pour nettoyer les processus fils
 void gestionnaire_signaux_fils(int sig) {
+    (void)sig; //on fait une void cast pour que le compilateur comprenne qu'on se moque de cette variable (handler lié à SIGCHLD)
+    
     pid_t pid;
 
     //tant que le père arrive à récupérer le signal de mort de l'un de ses fils (peut importe les raisons de la mort), màj le compteur de fils en ligne sans arrêter d'écouter les nouveau clients

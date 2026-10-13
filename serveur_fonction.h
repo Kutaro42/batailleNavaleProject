@@ -33,20 +33,21 @@ extern int nb_joueurs_actifs;
 typedef struct{
     int x;
     int y;
-} __attribute__((packed)) position_;
+} __attribute__((packed)) position_t;
 
 
 //   Résultat renvoyé par le serveur au client
 enum RESULT_SHOOT{
     RATEE,
     TOUCHEE,
-    COULEE
+    COULEE,
+    GAGNEE
 };
 
 typedef struct{
     enum RESULT_SHOOT resultat;
     int coup_restant ;
-} __attribute__((packed)) ReponseServeur;
+} __attribute__((packed)) reponse_serveur_t;
 
 enum TYPE_BOAT{
     FREGATE=3,
@@ -60,22 +61,22 @@ enum STATE_CASE{
 
 typedef struct Case {
     enum STATE_CASE etat;
-    position_ position;
+    position_t position;
 }Case;
 
 
-typedef struct Bateau{
+typedef struct bateau_t{
     enum TYPE_BOAT type;
     struct Case *cases_occupee[5]; //mettre à 5 case, on en activera que 3 pour les frégate (on met des zéro sur les deux dernières)
 
-}Bateau;
+}bateau_t;
 
 
 
-typedef struct bateau_en_jeu_{
-    struct Bateau *Bateau_en_jeu[NBRE_FREGATES+NBRE_PORTE_AVIONS];
+typedef struct bateau_en_jeu_t{
+    struct bateau_t *bateau_en_jeu_t[NBRE_FREGATES+NBRE_PORTE_AVIONS];
 
-}bateau_en_jeu_;
+}bateau_en_jeu_t;
 
 
 //METHODES & FONCTIONS
@@ -83,24 +84,24 @@ int afficher_ecran_titre();
 
 void gestionnaire_signaux_fils(int sig);
 
-_Bool la_partie_est_elle_finie(int * nbr_coup_restant, _Bool * fin_de_partie_, bateau_en_jeu_ * liste_des_bateaux,_Bool * victoire);
+_Bool la_partie_est_elle_finie(int * nbr_coup_restant, _Bool * fin_de_partie_, bateau_en_jeu_t * liste_des_bateau_tx,_Bool * victoire);
 
-void envoyer_code_victoire(ReponseServeur *response);
+void envoyer_code_victoire(reponse_serveur_t *response);
 
-_Bool reste_t_il_un_bateau(bateau_en_jeu_ *bateau_en_jeu);
+_Bool reste_t_il_un_bateau_t(bateau_en_jeu_t *bateau_en_jeu_t);
 
 int dec_nb_coup_restant(int * nbr_coup_restant);
 
 _Bool print_nb_coup_restant(char * buff, int nb_coup);
 
-Bateau * trouver_le_bateau_correspondant(position_ * pos, bateau_en_jeu_ * liste_bateau);
+bateau_t * trouver_le_bateau_correspondant(position_t * pos, bateau_en_jeu_t * liste_bateau_t);
 
-int resultat_du_tir(position_ *pos, bateau_en_jeu_ *liste_des_bateau);
+int resultat_du_tir(position_t *pos, bateau_en_jeu_t *liste_des_bateau_t);
 
-_Bool le_bateau_est_il_coulee(Bateau * le_bateau);
+_Bool le_bateau_t_est_il_coulee(bateau_t * le_bateau_t);
 
-_Bool generation_des_navires(bateau_en_jeu_ *liste_de_bateau);
+_Bool generation_des_navires(bateau_en_jeu_t *liste_de_bateau_t);
 
-_Bool liberation_memoire(bateau_en_jeu_ *ma_liste);
+void liberation_memoire(bateau_en_jeu_t *ma_liste);
 
-_Bool initialisation_de_la_partie(bateau_en_jeu_ *liste_de_bateau);
+_Bool initialisation_de_la_partie(bateau_en_jeu_t *liste_de_bateau_t);

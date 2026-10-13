@@ -7,8 +7,6 @@ char* id=0;
 short port=0;
 int sock=0;	/* socket de communication */
 
-_Bool connection_closed = 0; //renseigne l'état de la connection (=indicateur de l'état de connection)
-
 
 int main(int argc, char** argv)
 {
@@ -104,18 +102,17 @@ int main(int argc, char** argv)
 
 			_Bool fin_de_partie_ =0;
 			_Bool victoire_=0;
-			_Bool reste_il_un_bateau_=0;
 
 			//CHARGEMENT ET INITIALISATION DES PARAMETRES DE JEU
 	
 			int nbr_coup_restant_ = TOTAL_COUPS;//nb_coup_restant sert au dénombrement des essais restants
 
 			//liste des bateaux en jeu
-			bateau_en_jeu_ liste_des_bateaux;
+			bateau_en_jeu_t liste_des_bateaux;
 
 			// CHARGER LA MAP :
 
-			// La fonction reçoit bien un pointeur (bateau_en_jeu_ *)
+			// La fonction reçoit bien un pointeur (bateau_en_jeu_t *)
 			if (generation_des_navires(&liste_des_bateaux) == 0) {
 				printf("Les navires ont été générés avec succès !\n");
 			}
@@ -126,16 +123,16 @@ int main(int argc, char** argv)
 			}
 
 
-			position_ tir_client; //stocker la position reçu du client
+			position_t tir_client; //stocker la position reçu du client
 
 			//créer la structure d'envoi
-			ReponseServeur response;
+			reponse_serveur_t reponse;
 
 			//JEU
 			while (!la_partie_est_elle_finie(&nbr_coup_restant_, &fin_de_partie_, &liste_des_bateaux, &victoire_)) {
 
 				// ON LIT LE MSG DU CLIENT
-				ret=read(sock_pipe,&tir_client,sizeof(position_));
+				ret=read(sock_pipe,&tir_client,sizeof(position_t));
 				if (ret<=0) {
 					printf("%s: read=%d: %s\n",argv[0],ret,
 						strerror(errno));
@@ -149,28 +146,28 @@ int main(int argc, char** argv)
 				printf("[Serveur] Tir reçu du joueur ! Coordonnées : X = %d, Y = %d\n", tir_client.x, tir_client.y);
 
 
-				//vérifier si une case de bateau existe à la position correspondante, si active (renvoi "touché")
-				response.resultat =resultat_du_tir(&tir_client, &liste_des_bateaux);
+				//vérifier si une case de bateau_t existe à la position correspondante, si active (renvoi "touché")
+				reponse.resultat =resultat_du_tir(&tir_client, &liste_des_bateaux);
 				//(void)res;
 
 				//on finit de remplir la structure d'envoi tout en mettant à jour la variable de jeu, de façon élégante.
-				response.coup_restant = dec_nb_coup_restant(&nbr_coup_restant_);
+				reponse.coup_restant = dec_nb_coup_restant(&nbr_coup_restant_);
 
 
-				//A CE STADE, ON vERIFIE QUE LE CLIENT n'A PAS DETRUIT LE DERNIER BATEAU
+				//A CE STADE, ON vERIFIE QUE LE CLIENT n'A PAS DETRUIT LE DERNIER bateau_t
 				if(la_partie_est_elle_finie(&nbr_coup_restant_, &fin_de_partie_, &liste_des_bateaux, &victoire_)){
 					if (fin_de_partie_ && victoire_){
-						envoyer_code_victoire(&response);
+						envoyer_code_victoire(&reponse);
 					}
 				}
 				//--------------------------------------------------------------------------
-				// Note : cette logique à ses limites : on réécrit sur la structure les informations de victoire : le client ne peut que supposer qu'il à couler le dernier bateau, car il recevra directement le code de victoire au lieu de son résultat de tir
+				// Note : cette logique à ses limites : on réécrit sur la structure les informations de victoire : le client ne peut que supposer qu'il à couler le dernier bateau_t, car il recevra directement le code de victoire au lieu de son résultat de tir
 
 				// ON RÉPOND AU CLIENT
 				//sprintf(buf_write); --> pas besoin de mise en forme
 
 				//on balance directement en binaire la valeur entière de res = TOUCHEE RATEE COULEE
-				ret=write(sock_pipe,&response,sizeof(ReponseServeur));
+				ret=write(sock_pipe,&reponse,sizeof(reponse_serveur_t));
 
 				//si le retour s'est mal passé, on traite l'erreur
 				if (ret<=0) {
