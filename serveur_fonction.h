@@ -20,7 +20,7 @@
 
 
 #define TOTAL_COUPS 50
-#define TAILLE_GRILLE 20
+#define TAILLE_GRILLE 50
 #define TAILLE_BUFF 50
 #define NBRE_PORTE_AVIONS 1
 #define NBRE_FREGATES 1
