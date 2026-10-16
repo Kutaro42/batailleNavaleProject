@@ -145,11 +145,16 @@ int main(int argc, char** argv)
 
 				// ON LIT LE MSG DU CLIENT
 				ret=read(socket_dialogue_fils,&tir_client,sizeof(position_t));
-				if (ret<=0) {
+				if (ret< 0) {
 					printf("%s: read=%d: %s\n",argv[0],ret,
 						strerror(errno));
 					break;
 				}
+				else if (ret == 0) {
+    				// Si le client s'est déconnecté proprement (ret == 0), on ne fait RIEN (pas de printf)
+    				break;
+				}
+				
 				printf("serveur %s recu de (%s,%4d)\n", id, inet_ntoa(client.sin_addr), ntohs(client.sin_port));
 
 				//TRAITEMENT DU MSG CLIENT
