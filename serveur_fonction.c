@@ -295,6 +295,7 @@ printf("===========================================\n\n");
 }
 
 void signal_sigterm_serveur(int num_signal) {
+    (void)num_signal; // Indique au compilateur qu'on n'utilise pas cette variable
     printf("\n[Serveur] Signal reçu (Ctrl-C détecté).\n");
     
     printf("[Serveur] Envoi du signal de terminaison aux parties en cours.\n");
@@ -306,6 +307,7 @@ void signal_sigterm_serveur(int num_signal) {
 } 
 
 void signal_sigterm_fils(int sig) {
-printf("[Fils PID %d] Message pré-mortem : arrêt de la partie en cours !\n", getpid());
-exit(EXIT_SUCCESS);
+    (void)sig; // Indique au compilateur qu'on n'utilise pas cette variable
+    printf("[Fils PID %d] Message pré-mortem : arrêt de la partie en cours !\n", getpid());
+    exit(EXIT_SUCCESS);
 }
