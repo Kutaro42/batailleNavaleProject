@@ -9,7 +9,7 @@ _Bool connection_fermee = 0; //renseigne l'état de la connection (=indicateur d
 
 int socket_principal=0;	/* socket de communication */
 
-int main(int argc, char* argv)
+int main(int argc, char** argv)
 {
 struct  sockaddr_in moi; /* SAP du client ---> service accès point */
 struct  sockaddr_in serveur; /* SAP du serveur */
@@ -18,26 +18,26 @@ socklen_t longueur_socket;
 _Bool victoire=0;
 //_Bool defaite=0; //on l'ajoute pour gérer les états de jeu plus facilement
 
-	if (argc!=4) {
-		fprintf(stderr,"usage: %s id serveur port\n",argv[0]); //si il n'ya pas 4 arg, rediriger vers la sortie d'erreur le msg et quitter avec un code 1
-		exit(EXIT_SUCCESS);
+	if (argc!=3) {
+		fprintf(stderr,"usage: %s id serveur port\n",argv[0]); //si il n'ya pas 3 arg, rediriger vers la sortie d'erreur le msg et quitter avec un code 1
+		exit(EXIT_FAILURE);
 	}
-	id= argv[1];	//id=argument 1
-	port_de_sortie= atoi(argv[3]); // prendre le 3eme arg et le convertir en valeur entière
+
+	port_de_sortie= atoi(argv[2]); // prendre le 2eme arg et le convertir en valeur entière
 
 	if ((socket_principal = socket (AF_INET,SOCK_STREAM,0)) == -1) { //configurer un socket en ipv4, avec un TCP, avec la valeur par défaut 0;
 		fprintf(stderr,"%s: socket %s\n",argv[0],
 			strerror(errno));
-		exit(EXIT_SUCCESS); //si le programme rentre dans ce if, la création du socket s'est mal passée
+		exit(EXIT_FAILURE); //si le programme rentre dans ce if, la création du socket s'est mal passée
 	}
 	serveur.sin_family = AF_INET; //configuration du protocole de communication IPv4
 	serveur.sin_port = htons(port_de_sortie); // direction du port de sortie (s) (renversé dans l'ordre Big endian pour protocole réseau)
-	inet_aton(argv[2],&serveur.sin_addr); //communique avec l'interface serveur
+	inet_aton(argv[1],&serveur.sin_addr); //communique avec l'interface serveur
 	
 	if (connect(socket_principal,(struct sockaddr *)&serveur,sizeof(serveur))<0) { //si la connection échoue, traiter l'erreur
 		fprintf(stderr,"%s: connect %s\n",argv[0],strerror(errno));
 		perror("bind");
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
 	longueur_socket=sizeof(moi); 
 	getsockname(socket_principal,(struct  sockaddr  *)&moi,&longueur_socket); //on met à jour les informations du socket
@@ -72,12 +72,9 @@ _Bool victoire=0;
 
         // PARTIE GESTION CLIENT |==> on vise à long terme une gestion sécurisé des entrées clavier du joueur, pour éviter et empêcher les erreurs de saisie avant qu'elles soient envoyées au serveur.
 
-		//sprintf(buf_ecriture,":%s",id); //coordonées x;y ==> temporairement 'buf_ecriture' pour vérifier, résultat de la couche de sécurité dans un second temps.
-		printf(" client %2s: (%s:%4d) envoie a  ", id,      //debug
-			inet_ntoa(moi.sin_addr),ntohs(moi.sin_port));   //debug
-		printf("(%s:%4d) : %s\n",                           //debug
+		/*printf("(%s:%4d) : %s\n",                           //debug
 			inet_ntoa(serveur.sin_addr),ntohs(serveur.sin_port),
-			buf_ecriture);
+			buf_ecriture);*/
 
 		// Au lieu de : ret = write(socket_principal, buf_ecriture, strlen(buf_ecriture));
 		// On envoie directement les 8 octets de la structure position_t :
@@ -93,8 +90,6 @@ _Bool victoire=0;
 
         // PARTIE GESTION SERVEUR
 
-		printf(" client %2s: (%s:%4d) recoit de ",id, 
-				inet_ntoa(moi.sin_addr),ntohs(moi.sin_port));
 
 				//ici on doit s'attendre à recevoir le message retour du serveur sous forme de structure reponse.
 		ret=read(socket_principal,&reponse,sizeof(reponse_serveur_t));	//on lit la structure binaire <reponse> dans le descripteur standard du socket serveur (serveur)

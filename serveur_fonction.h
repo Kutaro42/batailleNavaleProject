@@ -19,7 +19,7 @@
 #include <signal.h>
 
 
-#define TOTAL_COUPS 4
+#define TOTAL_COUPS 50
 #define TAILLE_GRILLE 20
 #define TAILLE_BUFF 50
 #define NBRE_PORTE_AVIONS 1
@@ -93,8 +93,6 @@ void envoyer_code_victoire_defaite(reponse_serveur_t *reponse,_Bool *fin_de_part
 _Bool reste_t_il_un_bateau_t(bateau_en_jeu_t *bateau_en_jeu_t);
 
 int dec_nb_coup_restant(int * nbr_coup_restant);
-
-_Bool print_nb_coup_restant(char * buff, int nb_coup);
 
 bateau_t * trouver_le_bateau_correspondant(position_t * pos, bateau_en_jeu_t * liste_bateau_t);
 

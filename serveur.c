@@ -35,20 +35,20 @@ int main(int argc, char** argv)
 	//si sigaction renvoie le code de sortie -1, il y a un problème
 	if (sigaction(SIGCHLD, &signal_d_action, NULL) == -1) { // int sigaction(int signum, const struct sigaction *act, struct sigaction *oldact);
 		fprintf(stderr, "Erreur sigaction\n"); //on signale l'erreur sur la sortie d'erreur standard
-		exit(EXIT_SUCCESS); 
+		exit(EXIT_FAILURE); 
 	}
 	struct  sockaddr_in serveur; /* Service Access Point du serveur */
 
 	if (argc!=3) {
 		fprintf(stderr,"usage: %s id port\n",argv[0]);
-		exit(EXIT_SUCCESS);
+		exit(EXIT_FAILURE);
 	}
 	id= argv[1];
 	port= atoi(argv[2]);
 
 	if ((socket_principal = socket (AF_INET,SOCK_STREAM,0)) == -1) {
 		fprintf(stderr,"%s: socket %s\n",argv[0],strerror(errno));
-		exit(EXIT_SUCCESS);
+		exit(EXIT_FAILURE);
 	}
 
 	serveur.sin_family = AF_INET;
@@ -58,13 +58,13 @@ int main(int argc, char** argv)
 	//Ouvrir un descripteur avec le socket configuré
 	if (bind (socket_principal,(struct sockaddr*)&serveur,sizeof(serveur))<0) {
 		fprintf(stderr,"%s: bind %s\n",argv[0],strerror(errno));
-		exit(EXIT_SUCCESS);
+		exit(EXIT_FAILURE);
 	}
 
 	//écouter au maximum 5 tentative de communication en simultané
    if (listen (socket_principal,5)!=0) {
 		fprintf(stderr,"%s: listen %s\n",argv[0],strerror(errno));
-		exit(EXIT_SUCCESS);
+		exit(EXIT_FAILURE);
    }
 
 
@@ -190,8 +190,12 @@ int main(int argc, char** argv)
 			close(socket_dialogue_fils);
 			//nettoyer la liste des bateaux allouée
 			liberation_memoire(&liste_des_bateaux);
+			//msg dans la console pour signifier la mort du fils après que la partie joué avec sont client soit interrompue ou finie
+			printf("Fin de la partie avec le client(%s,%4d)\n", 
+				inet_ntoa(client.sin_addr), ntohs(client.sin_port));
 
-			exit(EXIT_FAILURE);//fermer avant que le fils fasse n'importe quoi (remonte dans la main et commence à intercepter les client en se dédoublant)		
+			exit(EXIT_SUCCESS);//fermer avant que le fils fasse n'importe quoi (remonte dans la main et commence à intercepter les client en se dédoublant)	
+	
 		} else {
 			// le PÈRE
 			// La variable 'pid' contient l'identifiant du fils qui vient de naître

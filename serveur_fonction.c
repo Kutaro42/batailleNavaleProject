@@ -3,17 +3,6 @@
 volatile sig_atomic_t nb_joueurs_actifs = 0; //volatile pour éviter de charger dans un registre et ne plus lire la RAM
 // sig_atomic_t garantit que le processeur traite l'opération en un seul bloc (ne pas s'arrêter en pleine lecture/écriture et de corrompre le programme en cas d'interruption)
 
-//-----------------------INUTILE-------------------
-//formatte un buffer spécifié en argument; renvoie 0 = faux en cas d'erreur, 1=vrai si tout se passe bien
-_Bool print_nb_coup_restant(char * buff, int nb_coup){
-    if(snprintf(buff, TAILLE_BUFF, "Il vous reste %d coups à jouer", nb_coup)){ //correction : taille définie directement par la taille maximum TAILLE_BUFF car sizeof() renvoie une taille de 8bit (comprenhensible car *buf est une adresse sur 8 bit)
-        return 1;
-    }
-    else {
-        return 0; 
-    }
-    
-}//------------------------------------------------
 
 //renvoie le nbr de coups restants
 int dec_nb_coup_restant(int * nbr_coup_restant){
