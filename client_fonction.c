@@ -8,7 +8,7 @@ void afficher_ecran_fin(_Bool * victoire){
 
     if(!(*victoire)){
         printf("\n============================================\n");
-        printf("|  PARTIE TERMINÉE ! Plus de coups restants. |\n");
+        printf("|       VOUS AVEZ ÉTÉ DÉCONNECTÉ   !!!       |\n");
         printf("============================================\n");
     } else {
         printf("\n============================================\n");
@@ -98,8 +98,9 @@ _Bool interpreter_la_reponse_serveur(char * buff, reponse_serveur_t * reponse,_B
   
         snprintf(buff,size,"RATÉ, Coup Restant : %d",reponse->coup_restant); //ici pas besoin de forcer le zéro de fin de chaine (contrairement à sprintf classique)
         break;
-    case 2: //touché
-        snprintf(buff,size,"TOUCHÉ, Coup Restant : %d",reponse->coup_restant);
+    case 2: //coulé
+        
+        snprintf(buff,size,"COULÉ, Coup Restant : %d",reponse->coup_restant);
         break;
 
     case 3:// gagné
@@ -108,10 +109,14 @@ _Bool interpreter_la_reponse_serveur(char * buff, reponse_serveur_t * reponse,_B
         break;
     case 4://perdu
         snprintf(buff,size,"PERDU !!! Vous n'avez pas détruit tout les bateaux adverses ! Il vous restait %d coups à jouer",reponse->coup_restant);
+        printf("\n============================================\n");
+        printf("|  PARTIE TERMINÉE ! Plus de coups restants. |\n");
+        printf("============================================\n");
         *victoire=0;
         break;
-    default: //coulé
-        snprintf(buff,size,"COULÉ, Coup Restant : %d",reponse->coup_restant);
+    default: //Touché
+    snprintf(buff,size,"TOUCHÉ, Coup Restant : %d",reponse->coup_restant);
+        
         break;
     }
     
