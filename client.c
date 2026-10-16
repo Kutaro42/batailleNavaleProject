@@ -9,7 +9,7 @@ _Bool connection_fermee = 0; //renseigne l'état de la connection (=indicateur d
 
 int socket_principal=0;	/* socket de communication */
 
-int main(int argc, char** argv)
+int main(int argc, char* argv)
 {
 struct  sockaddr_in moi; /* SAP du client ---> service accès point */
 struct  sockaddr_in serveur; /* SAP du serveur */
@@ -20,7 +20,7 @@ _Bool victoire=0;
 
 	if (argc!=4) {
 		fprintf(stderr,"usage: %s id serveur port\n",argv[0]); //si il n'ya pas 4 arg, rediriger vers la sortie d'erreur le msg et quitter avec un code 1
-		exit(1);
+		exit(EXIT_SUCCESS);
 	}
 	id= argv[1];	//id=argument 1
 	port_de_sortie= atoi(argv[3]); // prendre le 3eme arg et le convertir en valeur entière
@@ -28,7 +28,7 @@ _Bool victoire=0;
 	if ((socket_principal = socket (AF_INET,SOCK_STREAM,0)) == -1) { //configurer un socket en ipv4, avec un TCP, avec la valeur par défaut 0;
 		fprintf(stderr,"%s: socket %s\n",argv[0],
 			strerror(errno));
-		exit(1); //si le programme rentre dans ce if, la création du socket s'est mal passée
+		exit(EXIT_SUCCESS); //si le programme rentre dans ce if, la création du socket s'est mal passée
 	}
 	serveur.sin_family = AF_INET; //configuration du protocole de communication IPv4
 	serveur.sin_port = htons(port_de_sortie); // direction du port de sortie (s) (renversé dans l'ordre Big endian pour protocole réseau)
