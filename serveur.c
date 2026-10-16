@@ -1,3 +1,6 @@
+//noms et prénom du binôme :
+// - Aubin Alexendre 
+// - Decoudun Nolann
 //serveurt.c (serveur TCP)
 
 #include "serveur_fonction.h"

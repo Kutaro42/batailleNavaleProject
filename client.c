@@ -1,3 +1,6 @@
+//noms et prénom du binôme :
+// - Aubin Alexendre 
+// - Decoudun Nolann
 // clientt.c (client TCP)
 
 #include "client_fonction.h"
