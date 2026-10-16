@@ -90,7 +90,7 @@ _Bool la_partie_est_elle_finie(int * nbr_coup_restant, _Bool * fin_de_partie_, b
 
 void envoyer_code_victoire_defaite(reponse_serveur_t *reponse,_Bool *fin_de_partie,_Bool *victoire);
 
-_Bool reste_t_il_un_bateau_t(bateau_en_jeu_t *bateau_en_jeu_t);
+_Bool reste_t_il_un_bateau(bateau_en_jeu_t *bateau_en_jeu_t);
 
 int dec_nb_coup_restant(int * nbr_coup_restant);
 
@@ -98,7 +98,7 @@ bateau_t * trouver_le_bateau_correspondant(position_t * pos, bateau_en_jeu_t * l
 
 int resultat_du_tir(position_t *pos, bateau_en_jeu_t *liste_des_bateau_t);
 
-_Bool le_bateau_t_est_il_coulee(bateau_t * le_bateau_t);
+_Bool le_bateau_est_il_coulee(bateau_t * le_bateau_t);
 
 _Bool generation_des_navires(bateau_en_jeu_t *liste_de_bateau_t);
 
