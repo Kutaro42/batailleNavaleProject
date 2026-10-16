@@ -104,10 +104,11 @@ int main(int argc, char** argv)
 		} else if (pid == 0) {
 			// le FILS
 			// Tout ce qui est écrit ici sera exécuté uniquement par le clone
-
 			//fermer le socket copié du père :
 			close(socket_principal); //le fils sert juste à jouer avec le client, ça lui sert à rien
-
+			
+			signal(SIGINT, SIG_IGN);
+			signal(SIGTERM, signal_sigterm_fils);
 			//DECLARATION DES VARIABLES GLOBALES DE LA PARTIE
 
 			_Bool fin_de_partie_ = 0;

@@ -298,6 +298,14 @@ void signal_sigterm_serveur(int num_signal) {
     printf("\n[Serveur] Signal reçu (Ctrl-C détecté).\n");
     
     printf("[Serveur] Envoi du signal de terminaison aux parties en cours.\n");
+    if (kill(0, SIGTERM) == -1) {
+        perror("[Serveur] Erreur lors du kill global");
+    }
     printf("[Serveur] Arrêt du serveur.\n");
-    kill(0, SIGTERM); 
+    exit(EXIT_SUCCESS);
+} 
+
+void signal_sigterm_fils(int sig) {
+printf("[Fils PID %d] Message pré-mortem : arrêt de la partie en cours !\n", getpid());
+exit(EXIT_SUCCESS);
 }

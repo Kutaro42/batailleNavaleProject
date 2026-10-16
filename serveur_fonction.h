@@ -112,4 +112,4 @@ void afficher_grille_triche(const bateau_en_jeu_t *liste_des_bateaux_t);
  
 void signal_sigterm_serveur(int num_signal);
 
-
+void signal_sigterm_fils(int sig);
