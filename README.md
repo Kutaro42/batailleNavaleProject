@@ -1,9 +1,9 @@
 # Bataille Navale Client-Serveur en C
 
 Une implementation robuste et multi-joueurs du jeu de la **Bataille Navale** en C bare-metal/POSIX, s'appuyant sur l'architecture réseau client-serveur via des sockets TCP.
-*Attention : Ce projet à été exporté depuis la forge GitLab de l'IUT de la Rochelle, il est normal que des informations comme le repository graph ou les statistiques de contribution n'apparaissent pas*
----
 
+---
+*Attention : Ce projet à été exporté depuis la forge GitLab de l'IUT de la Rochelle, il est normal que des informations comme le repository graph ou les statistiques de contribution n'apparaissent pas*
 ## Sommaire
 
 - [Fonctionnalites](#fonctionnalites)
